@@ -1,0 +1,455 @@
+-- REGISTRAR USUARIO
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_usuario(
+    IN p_nombre_usuario VARCHAR(50),
+    IN p_contrasena VARCHAR(255),
+    IN p_id_rol INT
+)
+BEGIN
+
+INSERT INTO usuario(
+    nombre_usuario,
+    contraseña,
+    id_rol
+)
+VALUES(
+    p_nombre_usuario,
+    p_contrasena,
+    p_id_rol
+);
+
+END //
+
+DELIMITER ;
+
+                    --LOGIN USUARIO
+DELIMITER //
+
+CREATE PROCEDURE sp_login_usuario(
+    IN p_nombre_usuario VARCHAR(50)
+)
+BEGIN
+
+SELECT 
+    u.id_usuario,
+    u.nombre_usuario,
+    u.contraseña,
+    u.estado,
+    r.nombre AS rol
+
+FROM usuario u
+
+INNER JOIN rol r
+ON u.id_rol = r.id_rol
+
+WHERE u.nombre_usuario = p_nombre_usuario;
+
+END //
+
+DELIMITER ;
+
+                        -- REGISTRAR ESTUDIANTE
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_estudiante(
+
+IN p_DNI VARCHAR(15),
+IN p_nombres VARCHAR(100),
+IN p_apellidos VARCHAR(100),
+IN p_fecha_nacimiento DATE,
+IN p_telefono VARCHAR(20),
+IN p_correo VARCHAR(100),
+IN p_direccion VARCHAR(150)
+
+)
+
+BEGIN
+
+INSERT INTO estudiante(
+DNI,
+nombres,
+apellidos,
+fecha_nacimiento,
+telefono,
+correo,
+direccion
+)
+
+VALUES(
+p_DNI,
+p_nombres,
+p_apellidos,
+p_fecha_nacimiento,
+p_telefono,
+p_correo,
+p_direccion
+);
+
+
+END //
+
+DELIMITER ;
+
+                -- LISTAR ESTUDAINTES
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_estudiantes()
+
+BEGIN
+
+SELECT *
+FROM estudiante
+ORDER BY apellidos;
+
+END //
+
+DELIMITER ;
+
+
+                            -- BUSCAR ESTUDAINTE 
+
+DELIMITER //
+
+CREATE PROCEDURE sp_buscar_estudiante(
+IN p_dato VARCHAR(100)
+)
+
+BEGIN
+
+SELECT *
+
+FROM estudiante
+
+WHERE DNI LIKE CONCAT('%',p_dato,'%')
+
+OR nombres LIKE CONCAT('%',p_dato,'%')
+
+OR apellidos LIKE CONCAT('%',p_dato,'%');
+
+
+END //
+
+DELIMITER ;
+
+                            --REGISTRAR DOCENTE
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_docente(
+
+IN p_DNI VARCHAR(15),
+IN p_nombres VARCHAR(100),
+IN p_apellidos VARCHAR(100),
+IN p_especialidad VARCHAR(100),
+IN p_telefono VARCHAR(20),
+IN p_correo VARCHAR(100)
+
+)
+
+BEGIN
+
+INSERT INTO docente(
+DNI,
+nombres,
+apellidos,
+especialidad,
+telefono,
+correo
+)
+
+VALUES(
+p_DNI,
+p_nombres,
+p_apellidos,
+p_especialidad,
+p_telefono,
+p_correo
+);
+
+
+END //
+
+DELIMITER ;
+
+                        -- REGSITRAR MATRICULA
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_matricula(
+
+IN p_fecha DATE,
+IN p_inicio DATE,
+IN p_fin DATE,
+IN p_estudiante INT,
+IN p_ciclo INT
+
+)
+
+BEGIN
+
+
+INSERT INTO matricula(
+
+fecha_matricula,
+fecha_inicio,
+fecha_fin,
+id_estudiante,
+id_ciclo
+
+)
+
+VALUES(
+
+p_fecha,
+p_inicio,
+p_fin,
+p_estudiante,
+p_ciclo
+
+);
+
+
+END //
+
+DELIMITER ;
+
+
+                        -- COSNULTAR MATRICULA
+
+DELIMITER //
+
+CREATE PROCEDURE sp_historial_matricula(
+
+IN p_estudiante INT
+
+)
+
+BEGIN
+
+
+SELECT
+
+m.*,
+
+c.nombre AS ciclo
+
+
+FROM matricula m
+
+
+INNER JOIN ciclo_academico c
+
+ON m.id_ciclo=c.id_ciclo
+
+
+WHERE m.id_estudiante=p_estudiante;
+
+
+END //
+
+DELIMITER ;
+
+
+                                -- REGSITRAR PAGO ESTUDAINTE
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_pago_estudiante(
+
+IN p_fecha DATE,
+IN p_monto DECIMAL(10,2),
+IN p_concepto VARCHAR(100),
+IN p_periodo VARCHAR(50),
+IN p_inicio DATE,
+IN p_fin DATE,
+IN p_estudiante INT
+
+)
+
+BEGIN
+
+
+INSERT INTO pago_estudiante(
+
+fecha_pago,
+monto,
+concepto,
+periodo_pagado,
+fecha_inicio_pago,
+fecha_fin_pago,
+id_estudiante
+
+)
+
+VALUES(
+
+p_fecha,
+p_monto,
+p_concepto,
+p_periodo,
+p_inicio,
+p_fin,
+p_estudiante
+
+);
+
+
+END //
+
+DELIMITER ;
+
+                            -- HISTORIAL PAGO ESTUDAINTE
+DELIMITER //
+
+CREATE PROCEDURE sp_historial_pago_estudiante(
+
+IN p_estudiante INT
+
+)
+
+BEGIN
+
+
+SELECT *
+
+FROM pago_estudiante
+
+WHERE id_estudiante=p_estudiante
+
+ORDER BY fecha_pago DESC;
+
+
+END //
+
+DELIMITER ;
+
+                            --REGISTRAR ASISTENCIA
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_asistencia(
+
+IN p_fecha DATE,
+IN p_estado VARCHAR(20),
+IN p_estudiante INT,
+IN p_grupo INT
+
+)
+
+BEGIN
+
+
+INSERT INTO asistencia(
+
+fecha,
+estado_asistencia,
+id_estudiante,
+id_grupo
+
+)
+
+VALUES(
+
+p_fecha,
+p_estado,
+p_estudiante,
+p_grupo
+
+);
+
+
+END //
+
+DELIMITER ;
+
+
+                            --REGSITRAR CALIFICACIONES
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_calificacion(
+
+IN p_nota DECIMAL(5,2),
+IN p_estudiante INT,
+IN p_evaluacion INT
+
+)
+
+BEGIN
+
+
+INSERT INTO calificacion(
+
+nota,
+id_estudiante,
+id_evaluacion
+
+)
+
+VALUES(
+
+p_nota,
+p_estudiante,
+p_evaluacion
+
+);
+
+
+END //
+
+DELIMITER ;
+
+
+                        --REPORTE ESTUEAINTE
+DELIMITER //
+
+CREATE PROCEDURE sp_reporte_estudiante(
+
+IN p_estudiante INT
+
+)
+
+BEGIN
+
+
+SELECT
+
+e.nombres,
+e.apellidos,
+
+c.nombre AS curso,
+
+AVG(cal.nota) promedio
+
+
+FROM estudiante e
+
+
+INNER JOIN calificacion cal
+
+ON e.id_estudiante=cal.id_estudiante
+
+
+INNER JOIN evaluacion ev
+
+ON cal.id_evaluacion=ev.id_evaluacion
+
+
+INNER JOIN curso c
+
+ON ev.id_curso=c.id_curso
+
+
+WHERE e.id_estudiante=p_estudiante
+
+
+GROUP BY c.id_curso;
+
+
+END //
+
+DELIMITER ;
+
+

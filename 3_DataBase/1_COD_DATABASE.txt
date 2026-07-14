@@ -1,0 +1,413 @@
+CREATE DATABASE academia_einstein;
+
+USE academia_einstein;
+
+
+-- =====================================
+-- TABLA ROL
+-- =====================================
+CREATE TABLE rol (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+
+-- =====================================
+-- TABLA USUARIO
+-- =====================================
+CREATE TABLE usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NOT NULL,
+    estado ENUM('Activo','Bloqueado') DEFAULT 'Activo',
+    id_rol INT NOT NULL,
+
+    FOREIGN KEY (id_rol) REFERENCES rol(id_rol)
+);
+
+
+-- =====================================
+-- TABLA SEDE
+-- =====================================
+CREATE TABLE sede (
+    id_sede INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    direccion VARCHAR(150),
+    telefono VARCHAR(20),
+    estado ENUM('Activo','Inactivo') DEFAULT 'Activo'
+);
+
+
+-- =====================================
+-- TABLA AULA
+-- =====================================
+CREATE TABLE aula (
+    id_aula INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    capacidad INT,
+    id_sede INT NOT NULL,
+
+    FOREIGN KEY (id_sede)
+    REFERENCES sede(id_sede)
+);
+
+
+-- =====================================
+-- TABLA ESTUDIANTE
+-- =====================================
+CREATE TABLE estudiante (
+    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
+    DNI VARCHAR(15) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    fecha_nacimiento DATE,
+    telefono VARCHAR(20),
+    correo VARCHAR(100),
+    direccion VARCHAR(150),
+    estado_estudiante ENUM(
+        'Activo',
+        'Retirado',
+        'Suspendido'
+    ) DEFAULT 'Activo'
+);
+
+
+-- =====================================
+-- TABLA DOCENTE
+-- =====================================
+CREATE TABLE docente (
+    id_docente INT AUTO_INCREMENT PRIMARY KEY,
+    DNI VARCHAR(15) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    especialidad VARCHAR(100),
+    telefono VARCHAR(20),
+    correo VARCHAR(100)
+);
+
+
+-- =====================================
+-- TABLA CURSO
+-- =====================================
+CREATE TABLE curso (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_curso VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    estado ENUM(
+        'Activo',
+        'Inactivo'
+    ) DEFAULT 'Activo'
+);
+
+
+-- =====================================
+-- TABLA DOCENTE_CURSO
+-- Relación N:M
+-- =====================================
+CREATE TABLE docente_curso (
+    id_docente_curso INT AUTO_INCREMENT PRIMARY KEY,
+    id_docente INT NOT NULL,
+    id_curso INT NOT NULL,
+
+    FOREIGN KEY(id_docente)
+    REFERENCES docente(id_docente),
+
+    FOREIGN KEY(id_curso)
+    REFERENCES curso(id_curso)
+);
+
+
+-- =====================================
+-- TABLA CICLO ACADEMICO
+-- =====================================
+CREATE TABLE ciclo_academico (
+    id_ciclo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    fecha_inicio DATE,
+    fecha_fin DATE
+);
+
+
+-- =====================================
+-- TABLA GRUPO ACADEMICO
+-- =====================================
+CREATE TABLE grupo_academico (
+    id_grupo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_grupo VARCHAR(50) NOT NULL,
+    turno ENUM(
+        'Mañana',
+        'Tarde',
+        'Noche'
+    ),
+
+    id_ciclo INT NOT NULL,
+    id_sede INT NOT NULL,
+
+    FOREIGN KEY(id_ciclo)
+    REFERENCES ciclo_academico(id_ciclo),
+
+    FOREIGN KEY(id_sede)
+    REFERENCES sede(id_sede)
+);
+
+
+-- =====================================
+-- TABLA MATRICULA
+-- =====================================
+CREATE TABLE matricula (
+    id_matricula INT AUTO_INCREMENT PRIMARY KEY,
+
+    fecha_matricula DATE NOT NULL,
+
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+
+    estado ENUM(
+        'Vigente',
+        'Anulada'
+    ) DEFAULT 'Vigente',
+
+    estado_pago ENUM(
+        'Pagado',
+        'Pendiente',
+        'Vencido'
+    ) DEFAULT 'Pendiente',
+
+    id_estudiante INT NOT NULL,
+    id_ciclo INT NOT NULL,
+
+    FOREIGN KEY(id_estudiante)
+    REFERENCES estudiante(id_estudiante),
+
+    FOREIGN KEY(id_ciclo)
+    REFERENCES ciclo_academico(id_ciclo)
+);
+
+
+-- =====================================
+-- TABLA HORARIO
+-- =====================================
+CREATE TABLE horario (
+    id_horario INT AUTO_INCREMENT PRIMARY KEY,
+    dia VARCHAR(20),
+    hora_inicio TIME,
+    hora_fin TIME,
+
+    id_docente_curso INT NOT NULL,
+    id_aula INT NOT NULL,
+
+    FOREIGN KEY(id_docente_curso)
+    REFERENCES docente_curso(id_docente_curso),
+
+    FOREIGN KEY(id_aula)
+    REFERENCES aula(id_aula)
+);
+
+
+-- =====================================
+-- TABLA ASISTENCIA
+-- =====================================
+CREATE TABLE asistencia (
+    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
+
+    fecha DATE NOT NULL,
+
+    estado_asistencia ENUM(
+        'Presente',
+        'Falta',
+        'Tardanza'
+    ),
+
+    id_estudiante INT NOT NULL,
+    id_grupo INT NOT NULL,
+
+    FOREIGN KEY(id_estudiante)
+    REFERENCES estudiante(id_estudiante),
+
+    FOREIGN KEY(id_grupo)
+    REFERENCES grupo_academico(id_grupo)
+);
+
+
+-- =====================================
+-- TABLA EVALUACION
+-- =====================================
+CREATE TABLE evaluacion (
+    id_evaluacion INT AUTO_INCREMENT PRIMARY KEY,
+
+    nombre VARCHAR(100),
+
+    tipo ENUM(
+        'Simulacro',
+        'Practica Calificada',
+        'Examen'
+    ),
+
+    fecha DATE,
+
+    id_curso INT NOT NULL,
+
+    FOREIGN KEY(id_curso)
+    REFERENCES curso(id_curso)
+);
+
+
+-- =====================================
+-- TABLA CALIFICACION
+-- =====================================
+CREATE TABLE calificacion (
+    id_calificacion INT AUTO_INCREMENT PRIMARY KEY,
+
+    nota DECIMAL(5,2),
+
+    id_estudiante INT NOT NULL,
+    id_evaluacion INT NOT NULL,
+
+    FOREIGN KEY(id_estudiante)
+    REFERENCES estudiante(id_estudiante),
+
+    FOREIGN KEY(id_evaluacion)
+    REFERENCES evaluacion(id_evaluacion)
+);
+
+
+-- =====================================
+-- TABLA PAGO ESTUDIANTE
+-- =====================================
+CREATE TABLE pago_estudiante (
+
+    id_pago INT AUTO_INCREMENT PRIMARY KEY,
+
+    fecha_pago DATE NOT NULL,
+
+    monto DECIMAL(10,2) NOT NULL,
+
+    concepto VARCHAR(100),
+
+    periodo_pagado VARCHAR(50),
+
+    fecha_inicio_pago DATE,
+
+    fecha_fin_pago DATE,
+
+    estado ENUM(
+        'Pendiente',
+        'Cancelado'
+    ) DEFAULT 'Pendiente',
+
+    id_estudiante INT NOT NULL,
+
+
+    FOREIGN KEY(id_estudiante)
+    REFERENCES estudiante(id_estudiante)
+);
+
+
+-- =====================================
+-- TABLA PAGO DOCENTE
+-- =====================================
+CREATE TABLE pago_docente (
+    id_pago_docente INT AUTO_INCREMENT PRIMARY KEY,
+
+    fecha_pago DATE NOT NULL,
+
+    monto DECIMAL(10,2),
+
+    concepto VARCHAR(100),
+
+    estado ENUM(
+        'Pendiente',
+        'Cancelado'
+    ),
+
+    id_docente INT NOT NULL,
+
+    FOREIGN KEY(id_docente)
+    REFERENCES docente(id_docente)
+);
+
+
+-- =====================================
+-- TABLA REGISTRO ACTIVIDADES
+-- =====================================
+CREATE TABLE registro_actividad (
+    id_actividad INT AUTO_INCREMENT PRIMARY KEY,
+
+    accion VARCHAR(100) NOT NULL,
+
+    descripcion TEXT,
+
+    fecha_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    id_usuario INT NOT NULL,
+
+    FOREIGN KEY(id_usuario)
+    REFERENCES usuario(id_usuario)
+);
+
+-- =====================================
+-- TABLA LOG HISTORIAL DE PAGOS
+-- =====================================
+CREATE TABLE log_pago (
+
+    id_log_pago INT AUTO_INCREMENT PRIMARY KEY,
+
+    accion VARCHAR(100) NOT NULL,
+
+    descripcion TEXT,
+
+    fecha_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    estado_anterior VARCHAR(50),
+
+    estado_nuevo VARCHAR(50),
+
+
+    id_pago_estudiante INT NULL,
+
+    id_pago_docente INT NULL,
+
+
+    id_usuario INT NOT NULL,
+
+
+    FOREIGN KEY(id_pago_estudiante)
+    REFERENCES pago_estudiante(id_pago),
+
+
+    FOREIGN KEY(id_pago_docente)
+    REFERENCES pago_docente(id_pago_docente),
+
+
+    FOREIGN KEY(id_usuario)
+    REFERENCES usuario(id_usuario)
+
+);
+
+-- =====================================
+-- TABLA AVANCE ACADEMICO
+-- =====================================
+CREATE TABLE avance_academico (
+
+    id_avance INT AUTO_INCREMENT PRIMARY KEY,
+
+    tema VARCHAR(150) NOT NULL,
+
+    descripcion TEXT,
+
+    fecha DATE NOT NULL,
+
+
+    id_grupo INT NOT NULL,
+
+    id_docente INT NOT NULL,
+
+
+    FOREIGN KEY(id_grupo)
+    REFERENCES grupo_academico(id_grupo),
+
+
+    FOREIGN KEY(id_docente)
+    REFERENCES docente(id_docente)
+
+);

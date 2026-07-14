@@ -1,0 +1,326 @@
+    --Registrar actividad cuando un usuario inicia sesiónRegistrar actividad cuando un usuario inicia sesión
+DELIMITER //
+
+CREATE TRIGGER trg_login_usuario
+AFTER UPDATE ON usuario
+FOR EACH ROW
+BEGIN
+
+IF OLD.estado <> NEW.estado THEN
+
+INSERT INTO registro_actividad(
+accion,
+descripcion,
+id_usuario
+)
+
+VALUES(
+'ACTUALIZACION USUARIO',
+'Se modificó el estado del usuario',
+NEW.id_usuario
+);
+
+END IF;
+
+END //
+
+DELIMITER ;
+
+    --Registrar creación de estudiantes
+
+DELIMITER //
+
+CREATE TRIGGER trg_registro_estudiante
+AFTER INSERT ON estudiante
+FOR EACH ROW
+BEGIN
+
+INSERT INTO registro_actividad(
+accion,
+descripcion
+)
+
+VALUES(
+'REGISTRO ESTUDIANTE',
+CONCAT(
+'Nuevo estudiante registrado: ',
+NEW.nombres,
+' ',
+NEW.apellidos
+)
+);
+
+END //
+
+DELIMITER ;
+
+        --Registrar actualización de estudiantes
+
+DELIMITER //
+
+CREATE TRIGGER trg_actualizar_estudiante
+AFTER UPDATE ON estudiante
+FOR EACH ROW
+BEGIN
+
+INSERT INTO registro_actividad(
+accion,
+descripcion
+)
+
+VALUES(
+'ACTUALIZACION ESTUDIANTE',
+CONCAT(
+'Se actualizaron datos del estudiante ',
+NEW.nombres
+)
+);
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+        --Registrar matrícula automáticamente
+DELIMITER //
+
+CREATE TRIGGER trg_registro_matricula
+AFTER INSERT ON matricula
+FOR EACH ROW
+BEGIN
+
+
+INSERT INTO registro_actividad(
+accion,
+descripcion
+)
+
+VALUES(
+'NUEVA MATRICULA',
+CONCAT(
+'Se creó matrícula para estudiante ID ',
+NEW.id_estudiante
+)
+);
+
+
+END //
+
+DELIMITER ;
+
+    --Cambiar estado de pago de matrícula
+
+DELIMITER //
+
+CREATE TRIGGER trg_pago_actualiza_matricula
+AFTER INSERT ON pago_estudiante
+FOR EACH ROW
+BEGIN
+
+
+UPDATE matricula
+
+SET estado_pago='Pagado'
+
+WHERE id_estudiante = NEW.id_estudiante;
+
+
+END //
+
+DELIMITER ;
+
+
+        --Registrar historial de pagos estudiante
+
+
+DELIMITER //
+
+CREATE TRIGGER trg_log_pago_estudiante
+AFTER INSERT ON pago_estudiante
+FOR EACH ROW
+BEGIN
+
+
+INSERT INTO log_pago(
+
+accion,
+descripcion,
+id_pago_estudiante
+
+)
+
+VALUES(
+
+'REGISTRO PAGO',
+
+CONCAT(
+'Pago registrado por monto ',
+NEW.monto
+),
+
+NEW.id_pago
+
+);
+
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_log_pago_estudiante
+AFTER INSERT ON pago_estudiante
+FOR EACH ROW
+BEGIN
+
+
+INSERT INTO log_pago(
+
+accion,
+descripcion,
+id_pago_estudiante
+
+)
+
+VALUES(
+
+'REGISTRO PAGO',
+
+CONCAT(
+'Pago registrado por monto ',
+NEW.monto
+),
+
+NEW.id_pago
+
+);
+
+
+END //
+
+DELIMITER ;
+
+        --Registrar modificación de pago
+DELIMITER //
+
+CREATE TRIGGER trg_cambio_estado_pago
+AFTER UPDATE ON pago_estudiante
+FOR EACH ROW
+BEGIN
+
+
+IF OLD.estado <> NEW.estado THEN
+
+
+INSERT INTO log_pago(
+
+accion,
+descripcion,
+estado_anterior,
+estado_nuevo,
+id_pago_estudiante
+
+)
+
+VALUES(
+
+'CAMBIO ESTADO',
+
+'Se modificó estado del pago',
+
+OLD.estado,
+
+NEW.estado,
+
+NEW.id_pago
+
+);
+
+
+END IF;
+
+
+END //
+
+DELIMITER ;
+
+        --Validar nota máxima
+DELIMITER //
+
+CREATE TRIGGER trg_validar_nota
+BEFORE INSERT ON calificacion
+FOR EACH ROW
+BEGIN
+
+
+IF NEW.nota < 0 OR NEW.nota > 20 THEN
+
+SIGNAL SQLSTATE '45000'
+
+SET MESSAGE_TEXT =
+'La nota debe estar entre 0 y 20';
+
+END IF;
+
+
+END //
+
+DELIMITER ;
+
+        --Evitar pagos negativos
+
+DELIMITER //
+
+CREATE TRIGGER trg_validar_pago
+BEFORE INSERT ON pago_estudiante
+FOR EACH ROW
+BEGIN
+
+
+IF NEW.monto <= 0 THEN
+
+SIGNAL SQLSTATE '45000'
+
+SET MESSAGE_TEXT =
+'El monto debe ser mayor a cero';
+
+END IF;
+
+
+END //
+
+DELIMITER ;
+
+        --Cambiar estudiante a suspendido por deuda
+        
+DELIMITER //
+
+CREATE TRIGGER trg_estado_deuda
+AFTER INSERT ON pago_estudiante
+FOR EACH ROW
+BEGIN
+
+
+IF NEW.estado='Pendiente' THEN
+
+
+UPDATE estudiante
+
+SET estado_estudiante='Suspendido'
+
+WHERE id_estudiante=NEW.id_estudiante;
+
+
+END IF;
+
+
+END //
+
+DELIMITER ;

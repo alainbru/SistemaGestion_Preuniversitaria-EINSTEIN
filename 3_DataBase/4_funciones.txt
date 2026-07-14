@@ -1,0 +1,341 @@
+DELIMITER //
+
+CREATE FUNCTION fn_calcular_edad(
+    fecha_nacimiento DATE
+)
+RETURNS INT
+DETERMINISTIC
+
+BEGIN
+
+RETURN TIMESTAMPDIFF(
+    YEAR,
+    fecha_nacimiento,
+    CURDATE()
+);
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_estado_matricula(
+    fecha_fin DATE
+)
+
+RETURNS VARCHAR(20)
+
+DETERMINISTIC
+
+BEGIN
+
+IF fecha_fin >= CURDATE() THEN
+
+RETURN 'Vigente';
+
+ELSE
+
+RETURN 'Vencida';
+
+END IF;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_promedio_estudiante(
+    estudiante INT
+)
+
+RETURNS DECIMAL(5,2)
+
+READS SQL DATA
+
+BEGIN
+
+DECLARE promedio DECIMAL(5,2);
+
+
+SELECT AVG(nota)
+
+INTO promedio
+
+FROM calificacion
+
+WHERE id_estudiante = estudiante;
+
+
+RETURN IFNULL(promedio,0);
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_situacion_academica(
+promedio DECIMAL(5,2)
+)
+
+RETURNS VARCHAR(20)
+
+DETERMINISTIC
+
+BEGIN
+
+
+IF promedio >= 11 THEN
+
+RETURN 'Aprobado';
+
+
+ELSE
+
+RETURN 'Desaprobado';
+
+
+END IF;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_total_pagado(
+estudiante INT
+)
+
+RETURNS DECIMAL(10,2)
+
+READS SQL DATA
+
+BEGIN
+
+
+DECLARE total DECIMAL(10,2);
+
+
+SELECT SUM(monto)
+
+INTO total
+
+FROM pago_estudiante
+
+WHERE id_estudiante=estudiante
+
+AND estado='Cancelado';
+
+
+RETURN IFNULL(total,0);
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_deuda_estudiante(
+estudiante INT,
+costo DECIMAL(10,2)
+)
+
+RETURNS DECIMAL(10,2)
+
+READS SQL DATA
+
+BEGIN
+
+
+DECLARE pagado DECIMAL(10,2);
+
+
+SELECT SUM(monto)
+
+INTO pagado
+
+FROM pago_estudiante
+
+WHERE id_estudiante=estudiante
+
+AND estado='Cancelado';
+
+
+RETURN costo - IFNULL(pagado,0);
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_total_asistencias(
+estudiante INT
+)
+
+RETURNS INT
+
+READS SQL DATA
+
+BEGIN
+
+DECLARE cantidad INT;
+
+
+SELECT COUNT(*)
+
+INTO cantidad
+
+FROM asistencia
+
+WHERE id_estudiante=estudiante
+
+AND estado_asistencia='Presente';
+
+
+RETURN cantidad;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_porcentaje_asistencia(
+estudiante INT
+)
+
+RETURNS DECIMAL(5,2)
+
+READS SQL DATA
+
+BEGIN
+
+DECLARE total INT;
+DECLARE presentes INT;
+
+
+SELECT COUNT(*)
+INTO total
+
+FROM asistencia
+
+WHERE id_estudiante=estudiante;
+
+
+SELECT COUNT(*)
+INTO presentes
+
+FROM asistencia
+
+WHERE id_estudiante=estudiante
+
+AND estado_asistencia='Presente';
+
+
+IF total=0 THEN
+
+RETURN 0;
+
+END IF;
+
+
+RETURN (presentes*100)/total;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_estado_financiero(
+deuda DECIMAL(10,2)
+)
+
+RETURNS VARCHAR(20)
+
+DETERMINISTIC
+
+BEGIN
+
+
+IF deuda<=0 THEN
+
+RETURN 'Al día';
+
+ELSE
+
+RETURN 'Pendiente';
+
+END IF;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION fn_nombre_completo(
+nombres VARCHAR(100),
+apellidos VARCHAR(100)
+)
+
+RETURNS VARCHAR(250)
+
+DETERMINISTIC
+
+BEGIN
+
+RETURN CONCAT(
+nombres,
+' ',
+apellidos
+);
+
+END //
+
+DELIMITER ;
+
+
+

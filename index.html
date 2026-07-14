@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Academia Einstein</title>
+    <style>
+        /* ==========================================================================
+           6.1 GUÍA DE ESTILOS - VARIABLES CENTRALIZADAS
+           ========================================================================== */
+        :root {
+            /* Paleta de Colores Oficial */
+            --color-principal-azul: #0a4693;     /* Azul Corporativo: Confianza y Organización */
+            --color-secundario-blanco: #ffffff;  /* Blanco: Contenedores y espacios limpios */
+            --color-apoyo-gris-fondo: #f4f6f9;   /* Gris Claro: Fondo general de la app */
+            --color-apoyo-gris-borde: #e2e8f0;   /* Gris Claro: Bordes y separadores */
+
+            /* Estados Semánticos */
+            --color-estado-exito: #198754;       /* Verde: Operaciones exitosas */
+            --color-estado-advertencia: #ffb100; /* Amarillo: Avisos preventivos */
+            --color-estado-critico: #dc3545;     /* Rojo: Errores y campos vacíos */
+
+            /* Tipografía y Estructura */
+            --fuente-sistema: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --borde-radio: 8px;
+            --sombra-tarjeta: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ==========================================================================
+           ESTILOS GENERALES Y MAQUETACIÓN
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--fuente-sistema);
+        }
+
+        body {
+            background-color: var(--color-apoyo-gris-fondo);
+            color: #333333;
+            padding-bottom: 3rem;
+        }
+
+        /* Encabezado Institucional (Color Principal) */
+        .navbar {
+            background-color: var(--color-principal-azul);
+            color: var(--color-secundario-blanco);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .navbar .user-profile {
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 400px 1fr;
+            }
+        }
+
+        /* Contenedores y Tarjetas (Color Secundario) */
+        .card {
+            background-color: var(--color-secundario-blanco);
+            border-radius: var(--borde-radio);
+            box-shadow: var(--sombra-tarjeta);
+            padding: 1.5rem;
+            border: 1px solid var(--color-apoyo-gris-borde);
+        }
+
+        .card h3 {
+            color: var(--color-principal-azul);
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid var(--color-apoyo-gris-fondo);
+            padding-bottom: 0.5rem;
+        }
+
+        /* ==========================================================================
+           FORMULARIOS E INPUTS
+           ========================================================================== */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid var(--color-apoyo-gris-borde);
+            background-color: var(--color-secundario-blanco);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        /* Comportamiento interactivo de enfoque */
+        input:focus, select:focus {
+            border-color: var(--color-principal-azul);
+        }
+
+        /* Entrada con Error de Validación Estricto */
+        input.input-error {
+            border-color: var(--color-estado-critico);
+            background-color: #fdf2f2;
+        }
+
+        /* ==========================================================================
+           BOTONES (Jerarquía Visual)
+           ========================================================================== */
+        .btn {
+            display: inline-block;
+            padding: 0.65rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--color-principal-azul);
+            color: var(--color-secundario-blanco);
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: var(--color-apoyo-gris-fondo);
+            color: #555555;
+            border: 1px solid var(--color-apoyo-gris-borde);
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* ==========================================================================
+           COMPONENTES DE ESTADO (Alertas y Mensajes)
+           ========================================================================== */
+        .alert {
+            padding: 0.85rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d1e7dd;
+            color: var(--color-estado-exito);
+            border-left: 4px solid var(--color-estado-exito);
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid var(--color-estado-advertencia);
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: var(--color-estado-critico);
+            border-left: 4px solid var(--color-estado-critico);
+        }
+
+        /* ==========================================================================
+           TABLAS Y SEPARADORES
+           ========================================================================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--color-apoyo-gris-borde);
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--color-apoyo-gris-fondo);
+            color: #555555;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(10, 70, 147, 0.02); /* Sutil rastro del azul principal */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BARRA SUPERIOR DE LA ACADEMIA -->
+    <header class="navbar">
+        <h1>Academia Preuniversitaria Einstein — Panel Administrativo</h1>
+        <div class="user-profile">Conectado: Coordinador Académico</div>
+    </header>
+
+    <div class="container">
+
+        <!-- BLOQUE DE ALERTAS: DEMOSTRACIÓN DE ESTADOS SEMÁNTICOS -->
+        <div style="margin-bottom: 1.5rem;">
+            <div class="alert alert-success">
+                <span>✓</span> <strong>Estado Éxito:</strong> El pago de la pensión fue registrado correctamente en el sistema.
+            </div>
+            <div class="alert alert-warning">
+                <span>⚠</span> <strong>Estado Advertencia:</strong> El alumno Carlos Mendoza cuenta con una cuota por vencer en 3 días.
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            
+            <!-- TARJETA IZQUIERDA: FORMULARIO DEMOSTRATIVO -->
+            <div class="card">
+                <h3>Matrícula Rápida de Alumno</h3>
+                <form onsubmit="event.preventDefault();">
+                    
+                    <div class="form-group">
+                        <label for="txtNombre">Nombres Completos</label>
+                        <input type="text" id="txtNombre" placeholder="Ej: Juan Pérez">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="txtDni">Documento de Identidad (DNI)</label>
+                        <!-- Simulación de campo crítico / error si estuviera vacío en una validación -->
+                        <input type="text" id="txtDni" class="input-error" value="" placeholder="Campo obligatorio marcado en error">
+                        <span style="color: var(--color-estado-critico); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                            El DNI es obligatorio para procesar el registro.
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="selCiclo">Ciclo de Preparación</label>
+                        <select id="selCiclo">
+                            <option>Ciclo Regular San Marcos</option>
+                            <option>Ciclo UNI - Intensivo</option>
+                            <option>Pre-Católica</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Guardar Datos (Acción Primaria)</button>
+                    <button type="button" class="btn btn-secondary">Cancelar Operación</button>
+                </form>
+            </div>
+
+            <!-- TARJETA DERECHA: TABLA Y REPORTES LIMPIOS -->
+            <div class="card">
+                <h3>Últimos Estudiantes Registrados</h3>
+                <p style="color: #666; font-size: 0.85rem; margin-bottom: 1rem;">
+                    Listado de control interno montado sobre un contenedor limpio (Blanco) y bordes atenuados (Gris Claro).
+                </p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Estudiante</th>
+                            <th>Ciclo Asignado</th>
+                            <th>Estado Académico</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>EST-4021</strong></td>
+                            <td>Ana Torres Gomez</td>
+                            <td>Ciclo UNI - Intensivo</td>
+                            <td style="color: var(--color-estado-exito); font-weight: bold;">Activo</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EST-4022</strong></td>
+                            <td>Luis Durand Flores</td>
+                            <td>Pre-Católica</td>
+                            <td style="color: var(--color-estado-exito); font-weight: bold;">Activo</td>
+                        </tr>
+                        <tr>
+                            <td><strong>EST-4023</strong></td>
+                            <td>Sofía Rodriguez Ramos</td>
+                            <td>Ciclo Regular San Marcos</td>
+                            <td style="color: var(--color-estado-advertencia); font-weight: bold;">Inasistencias</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

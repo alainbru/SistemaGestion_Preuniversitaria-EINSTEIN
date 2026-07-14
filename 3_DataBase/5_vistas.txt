@@ -1,0 +1,426 @@
+CREATE VIEW vista_estudiantes AS
+
+SELECT
+
+e.id_estudiante,
+e.DNI,
+CONCAT(e.nombres,' ',e.apellidos) AS estudiante,
+e.telefono,
+e.correo,
+e.estado_estudiante
+
+FROM estudiante e;
+
+
+CREATE VIEW vista_matriculas AS
+
+SELECT
+
+m.id_matricula,
+
+CONCAT(
+e.nombres,' ',e.apellidos
+) AS estudiante,
+
+c.nombre AS ciclo,
+
+m.fecha_inicio,
+m.fecha_fin,
+
+m.estado,
+
+m.estado_pago
+
+
+FROM matricula m
+
+
+INNER JOIN estudiante e
+
+ON m.id_estudiante=e.id_estudiante
+
+
+INNER JOIN ciclo_academico c
+
+ON m.id_ciclo=c.id_ciclo;
+
+
+
+
+
+
+
+CREATE VIEW vista_estado_financiero AS
+
+SELECT
+
+e.id_estudiante,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+
+COUNT(p.id_pago) AS cantidad_pagos,
+
+
+IFNULL(
+SUM(
+CASE
+WHEN p.estado='Cancelado'
+THEN p.monto
+END
+),
+0
+) AS total_pagado
+
+
+FROM estudiante e
+
+
+LEFT JOIN pago_estudiante p
+
+ON e.id_estudiante=p.id_estudiante
+
+
+GROUP BY e.id_estudiante;
+
+
+
+
+
+
+
+CREATE VIEW vista_pagos_pendientes AS
+
+SELECT
+
+p.id_pago,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+
+p.monto,
+
+p.concepto,
+
+p.fecha_pago
+
+
+FROM pago_estudiante p
+
+
+INNER JOIN estudiante e
+
+ON p.id_estudiante=e.id_estudiante
+
+
+WHERE p.estado='Pendiente';
+
+
+
+CREATE VIEW vista_historial_pagos AS
+
+SELECT
+
+p.id_pago,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+
+p.fecha_pago,
+
+p.monto,
+
+p.concepto,
+
+p.periodo_pagado,
+
+p.estado
+
+
+FROM pago_estudiante p
+
+
+INNER JOIN estudiante e
+
+ON p.id_estudiante=e.id_estudiante;
+
+
+
+
+
+
+
+
+CREATE VIEW vista_docentes_cursos AS
+
+
+SELECT
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente,
+
+
+c.nombre_curso AS curso,
+
+
+d.especialidad
+
+
+FROM docente_curso dc
+
+
+INNER JOIN docente d
+
+ON dc.id_docente=d.id_docente
+
+
+INNER JOIN curso c
+
+ON dc.id_curso=c.id_curso;
+
+
+
+
+
+CREATE VIEW vista_horarios AS
+
+
+SELECT
+
+
+c.nombre_curso,
+
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente,
+
+
+h.dia,
+
+h.hora_inicio,
+
+h.hora_fin,
+
+
+a.nombre AS aula,
+
+
+s.nombre AS sede
+
+
+
+FROM horario h
+
+
+INNER JOIN docente_curso dc
+
+ON h.id_docente_curso=dc.id_docente_curso
+
+
+INNER JOIN docente d
+
+ON dc.id_docente=d.id_docente
+
+
+INNER JOIN curso c
+
+ON dc.id_curso=c.id_curso
+
+
+INNER JOIN aula a
+
+ON h.id_aula=a.id_aula
+
+
+INNER JOIN sede s
+
+ON a.id_sede=s.id_sede;
+
+
+
+
+
+
+
+CREATE VIEW vista_asistencia AS
+
+
+SELECT
+
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+
+a.fecha,
+
+
+a.estado_asistencia,
+
+
+g.nombre_grupo,
+
+
+s.nombre AS sede
+
+
+
+FROM asistencia a
+
+
+INNER JOIN estudiante e
+
+ON a.id_estudiante=e.id_estudiante
+
+
+INNER JOIN grupo_academico g
+
+ON a.id_grupo=g.id_grupo
+
+
+INNER JOIN sede s
+
+ON g.id_sede=s.id_sede;
+
+
+
+
+
+
+CREATE VIEW vista_rendimiento_academico AS
+
+
+SELECT
+
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+
+c.nombre_curso,
+
+
+ev.nombre AS evaluacion,
+
+
+cal.nota
+
+
+
+FROM calificacion cal
+
+
+INNER JOIN estudiante e
+
+ON cal.id_estudiante=e.id_estudiante
+
+
+INNER JOIN evaluacion ev
+
+ON cal.id_evaluacion=ev.id_evaluacion
+
+
+INNER JOIN curso c
+
+ON ev.id_curso=c.id_curso;
+
+
+
+
+
+
+
+
+CREATE VIEW vista_dashboard AS
+
+
+SELECT
+
+(SELECT COUNT(*) FROM estudiante)
+AS total_estudiantes,
+
+
+(SELECT COUNT(*) FROM docente)
+AS total_docentes,
+
+
+(SELECT COUNT(*) FROM curso)
+AS total_cursos,
+
+
+(SELECT COUNT(*) FROM matricula
+WHERE estado='Vigente')
+AS matriculas_activas,
+
+
+(SELECT SUM(monto)
+FROM pago_estudiante
+WHERE estado='Cancelado')
+AS ingresos;
+
+
+
+
+
+
+
+
+CREATE VIEW vista_auditoria AS
+
+
+SELECT
+
+
+ra.id_actividad,
+
+u.nombre_usuario,
+
+u.estado,
+
+ra.accion,
+
+ra.descripcion,
+
+ra.fecha_hora
+
+
+FROM registro_actividad ra
+
+
+INNER JOIN usuario u
+
+ON ra.id_usuario=u.id_usuario;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
