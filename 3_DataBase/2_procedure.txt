@@ -453,3 +453,56 @@ END //
 DELIMITER ;
 
 
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_estudiante(
+
+IN p_id_estudiante INT,
+IN p_DNI VARCHAR(15),
+IN p_nombres VARCHAR(100),
+IN p_apellidos VARCHAR(100),
+IN p_fecha_nacimiento DATE,
+IN p_telefono VARCHAR(20),
+IN p_correo VARCHAR(100),
+IN p_direccion VARCHAR(150),
+IN p_estado_estudiante ENUM('Activo','Retirado','Suspendido')
+
+)
+
+BEGIN
+
+UPDATE estudiante
+
+SET
+    DNI = p_DNI,
+    nombres = p_nombres,
+    apellidos = p_apellidos,
+    fecha_nacimiento = p_fecha_nacimiento,
+    telefono = p_telefono,
+    correo = p_correo,
+    direccion = p_direccion,
+    estado_estudiante = p_estado_estudiante
+
+WHERE id_estudiante = p_id_estudiante;
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_estudiante(
+IN p_id_estudiante INT
+)
+
+BEGIN
+
+UPDATE estudiante
+
+SET estado_estudiante='Retirado'
+
+WHERE id_estudiante=p_id_estudiante;
+
+END //
+
+DELIMITER ;

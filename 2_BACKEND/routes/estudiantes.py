@@ -28,7 +28,7 @@ def registrar_estudiante():
             datos["fecha_nacimiento"],
             datos["telefono"],
             datos["correo"],
-            datos["direccion"],
+            datos["direccion"]
         ]
     )
 
@@ -105,3 +105,64 @@ def buscar_estudiante(dato):
 
 
     return jsonify(estudiantes)
+
+# ===============================
+# ACTUALIZAR ESTUDIANTE
+# ===============================
+@estudiante_bp.route("/<int:id_estudiante>", methods=["PUT"])
+def actualizar_estudiante(id_estudiante):
+
+    datos = request.json
+
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.callproc(
+        "sp_actualizar_estudiante",
+        [
+            id_estudiante,
+            datos["DNI"],
+            datos["nombres"],
+            datos["apellidos"],
+            datos["fecha_nacimiento"],
+            datos["telefono"],
+            datos["correo"],
+            datos["direccion"],
+            datos["estado_estudiante"]
+        ]
+    )
+
+    conexion.commit()
+
+    cursor.close()
+    conexion.close()
+
+    return jsonify({
+        "mensaje": "Estudiante actualizado correctamente"
+    })
+    
+    
+# ===============================
+# RETIRAR ESTUDIANTE
+# ===============================
+@estudiante_bp.route("/<int:id_estudiante>", methods=["DELETE"])
+def eliminar_estudiante(id_estudiante):
+
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.callproc(
+        "sp_eliminar_estudiante",
+        [
+            id_estudiante
+        ]
+    )
+
+    conexion.commit()
+
+    cursor.close()
+    conexion.close()
+
+    return jsonify({
+        "mensaje":"Estudiante retirado correctamente"
+    })

@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from routes.docente import docente_bp
 
 #-----------MODULOS----------------
 from routes.usuarios import usuario_bp
@@ -17,6 +18,7 @@ jwt = JWTManager(app)
 # Registrar módulos de rutas (Solo una vez)
 app.register_blueprint(usuario_bp)
 app.register_blueprint(estudiante_bp)
+app.register_blueprint(docente_bp)
 
 # Clave para firmar tokens
 app.config["JWT_SECRET_KEY"] = "academia_einstein_secret"
