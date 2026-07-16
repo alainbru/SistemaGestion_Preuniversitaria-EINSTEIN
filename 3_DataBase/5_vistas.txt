@@ -197,11 +197,7 @@ CREATE VIEW vista_horarios AS
 
 
 SELECT
-
-
 c.nombre_curso,
-
-
 CONCAT(
 d.nombres,' ',
 d.apellidos
@@ -211,16 +207,9 @@ d.apellidos
 h.dia,
 
 h.hora_inicio,
-
 h.hora_fin,
-
-
 a.nombre AS aula,
-
-
 s.nombre AS sede
-
-
 
 FROM horario h
 
@@ -233,17 +222,13 @@ ON h.id_docente_curso=dc.id_docente_curso
 INNER JOIN docente d
 
 ON dc.id_docente=d.id_docente
-
-
 INNER JOIN curso c
 
 ON dc.id_curso=c.id_curso
 
-
 INNER JOIN aula a
 
 ON h.id_aula=a.id_aula
-
 
 INNER JOIN sede s
 
@@ -265,20 +250,10 @@ CONCAT(
 e.nombres,' ',
 e.apellidos
 ) AS estudiante,
-
-
 a.fecha,
-
-
 a.estado_asistencia,
-
-
 g.nombre_grupo,
-
-
 s.nombre AS sede
-
-
 
 FROM asistencia a
 
@@ -286,12 +261,9 @@ FROM asistencia a
 INNER JOIN estudiante e
 
 ON a.id_estudiante=e.id_estudiante
-
-
 INNER JOIN grupo_academico g
 
 ON a.id_grupo=g.id_grupo
-
 
 INNER JOIN sede s
 

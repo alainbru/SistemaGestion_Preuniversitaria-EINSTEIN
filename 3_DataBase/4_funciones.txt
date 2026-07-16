@@ -270,11 +270,7 @@ IF total=0 THEN
 RETURN 0;
 
 END IF;
-
-
 RETURN (presentes*100)/total;
-
-
 END //
 
 DELIMITER ;
