@@ -36,18 +36,20 @@ FOR EACH ROW
 BEGIN
 
 INSERT INTO registro_actividad(
-accion,
-descripcion
+    accion,
+    descripcion,
+    id_usuario
 )
 
 VALUES(
-'REGISTRO ESTUDIANTE',
-CONCAT(
-'Nuevo estudiante registrado: ',
-NEW.nombres,
-' ',
-NEW.apellidos
-)
+    'REGISTRO ESTUDIANTE',
+    CONCAT(
+        'Nuevo estudiante registrado: ',
+        NEW.nombres,
+        ' ',
+        NEW.apellidos
+    ),
+    1
 );
 
 END //

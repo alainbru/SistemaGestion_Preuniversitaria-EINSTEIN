@@ -28,7 +28,7 @@ def registrar_estudiante():
             datos["fecha_nacimiento"],
             datos["telefono"],
             datos["correo"],
-            datos["direccion"]
+            datos["direccion"],
         ]
     )
 
