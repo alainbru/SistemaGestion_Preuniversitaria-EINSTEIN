@@ -67,7 +67,8 @@ BEGIN
 
 INSERT INTO registro_actividad(
 accion,
-descripcion
+descripcion,
+id_usuario
 )
 
 VALUES(
@@ -75,14 +76,13 @@ VALUES(
 CONCAT(
 'Se actualizaron datos del estudiante ',
 NEW.nombres
-)
+),
+1
 );
 
 END //
 
 DELIMITER ;
-
-
 
 
 

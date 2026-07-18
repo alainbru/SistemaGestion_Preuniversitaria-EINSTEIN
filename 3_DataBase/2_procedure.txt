@@ -506,3 +506,804 @@ WHERE id_estudiante=p_id_estudiante;
 END //
 
 DELIMITER ;
+
+
+
+
+
+
+AGREGADAOS 
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_docente(
+
+IN p_DNI VARCHAR(15),
+IN p_nombres VARCHAR(100),
+IN p_apellidos VARCHAR(100),
+IN p_especialidad VARCHAR(100),
+IN p_telefono VARCHAR(20),
+IN p_correo VARCHAR(100)
+
+)
+
+BEGIN
+
+INSERT INTO docente(
+DNI,
+nombres,
+apellidos,
+especialidad,
+telefono,
+correo
+)
+
+VALUES(
+p_DNI,
+p_nombres,
+p_apellidos,
+p_especialidad,
+p_telefono,
+p_correo
+);
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_docentes()
+
+BEGIN
+
+SELECT
+
+id_docente,
+DNI,
+nombres,
+apellidos,
+especialidad,
+telefono,
+correo
+
+FROM docente;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_buscar_docente(
+
+IN p_dato VARCHAR(100)
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM docente
+
+WHERE DNI LIKE CONCAT('%',p_dato,'%')
+
+OR nombres LIKE CONCAT('%',p_dato,'%')
+
+OR apellidos LIKE CONCAT('%',p_dato,'%');
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_docente(
+
+IN p_id_docente INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM docente
+
+WHERE id_docente=p_id_docente;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_docente(
+
+IN p_id_docente INT,
+IN p_DNI VARCHAR(15),
+IN p_nombres VARCHAR(100),
+IN p_apellidos VARCHAR(100),
+IN p_especialidad VARCHAR(100),
+IN p_telefono VARCHAR(20),
+IN p_correo VARCHAR(100)
+
+)
+
+BEGIN
+
+UPDATE docente
+
+SET
+
+DNI=p_DNI,
+nombres=p_nombres,
+apellidos=p_apellidos,
+especialidad=p_especialidad,
+telefono=p_telefono,
+correo=p_correo
+
+WHERE id_docente=p_id_docente;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- MAS PROCEDURES AGREGADOS TABLA DOCENTE curso
+DELIMITER //
+
+CREATE PROCEDURE sp_asignar_docente_curso(
+
+IN p_id_docente INT,
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+INSERT INTO docente_curso(
+
+id_docente,
+id_curso
+
+)
+
+VALUES(
+
+p_id_docente,
+p_id_curso
+
+);
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_docente_curso()
+
+BEGIN
+
+SELECT
+
+dc.id_docente_curso,
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente,
+
+c.nombre_curso AS curso
+
+
+FROM docente_curso dc
+
+
+INNER JOIN docente d
+
+ON dc.id_docente=d.id_docente
+
+
+INNER JOIN curso c
+
+ON dc.id_curso=c.id_curso;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_cursos_por_docente(
+
+IN p_id_docente INT
+
+)
+
+BEGIN
+
+SELECT
+
+c.id_curso,
+c.nombre_curso,
+c.descripcion
+
+FROM docente_curso dc
+
+
+INNER JOIN curso c
+
+ON dc.id_curso=c.id_curso
+
+
+WHERE dc.id_docente=p_id_docente;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_docentes_por_curso(
+
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+SELECT
+
+d.id_docente,
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente,
+
+
+d.especialidad
+
+
+FROM docente_curso dc
+
+
+INNER JOIN docente d
+
+ON dc.id_docente=d.id_docente
+
+
+WHERE dc.id_curso=p_id_curso;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+                --CURSO
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_curso(
+
+IN p_nombre_curso VARCHAR(100),
+IN p_descripcion TEXT
+
+)
+
+BEGIN
+
+INSERT INTO curso(
+nombre_curso,
+descripcion
+)
+
+VALUES(
+p_nombre_curso,
+p_descripcion
+);
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_cursos()
+
+BEGIN
+
+SELECT
+
+id_curso,
+nombre_curso,
+descripcion,
+estado
+
+FROM curso;
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_buscar_curso(
+
+IN p_dato VARCHAR(100)
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM curso
+
+WHERE nombre_curso LIKE CONCAT('%',p_dato,'%');
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_curso(
+
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM curso
+
+WHERE id_curso=p_id_curso;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_curso(
+
+IN p_id_curso INT,
+IN p_nombre_curso VARCHAR(100),
+IN p_descripcion TEXT,
+IN p_estado ENUM('Activo','Inactivo')
+
+)
+
+BEGIN
+
+UPDATE curso
+
+SET
+
+nombre_curso=p_nombre_curso,
+descripcion=p_descripcion,
+estado=p_estado
+
+WHERE id_curso=p_id_curso;
+
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_desactivar_curso(
+
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+UPDATE curso
+
+SET estado='Inactivo'
+
+WHERE id_curso=p_id_curso;
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_ciclo(
+
+IN p_nombre VARCHAR(100),
+IN p_fecha_inicio DATE,
+IN p_fecha_fin DATE
+
+)
+
+BEGIN
+
+INSERT INTO ciclo_academico(
+nombre,
+fecha_inicio,
+fecha_fin
+)
+
+VALUES(
+p_nombre,
+p_fecha_inicio,
+p_fecha_fin
+);
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_ciclos()
+
+BEGIN
+
+SELECT
+
+id_ciclo,
+nombre,
+fecha_inicio,
+fecha_fin
+
+FROM ciclo_academico;
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_buscar_ciclo(
+
+IN p_dato VARCHAR(100)
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM ciclo_academico
+
+WHERE nombre LIKE CONCAT('%',p_dato,'%');
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_buscar_ciclo(
+
+IN p_dato VARCHAR(100)
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM ciclo_academico
+
+WHERE nombre LIKE CONCAT('%',p_dato,'%');
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_ciclo(
+
+IN p_id_ciclo INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM ciclo_academico
+
+WHERE id_ciclo=p_id_ciclo;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_ciclo(
+
+IN p_id_ciclo INT,
+IN p_nombre VARCHAR(100),
+IN p_fecha_inicio DATE,
+IN p_fecha_fin DATE
+
+)
+
+BEGIN
+
+UPDATE ciclo_academico
+
+SET
+
+nombre=p_nombre,
+fecha_inicio=p_fecha_inicio,
+fecha_fin=p_fecha_fin
+
+WHERE id_ciclo=p_id_ciclo;
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_ciclo(
+
+IN p_id_ciclo INT
+
+)
+
+BEGIN
+
+DELETE FROM ciclo_academico
+
+WHERE id_ciclo=p_id_ciclo;
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_grupo(
+
+IN p_nombre_grupo VARCHAR(50),
+IN p_turno ENUM('Mañana','Tarde','Noche'),
+IN p_id_ciclo INT,
+IN p_id_sede INT
+
+)
+
+BEGIN
+
+INSERT INTO grupo_academico(
+nombre_grupo,
+turno,
+id_ciclo,
+id_sede
+)
+
+VALUES(
+p_nombre_grupo,
+p_turno,
+p_id_ciclo,
+p_id_sede
+);
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_grupos()
+
+BEGIN
+
+SELECT
+
+g.id_grupo,
+g.nombre_grupo,
+g.turno,
+
+c.nombre AS ciclo,
+
+s.nombre AS sede
+
+
+FROM grupo_academico g
+
+
+INNER JOIN ciclo_academico c
+ON g.id_ciclo=c.id_ciclo
+
+
+INNER JOIN sede s
+ON g.id_sede=s.id_sede;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_buscar_grupo(
+
+IN p_dato VARCHAR(100)
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM grupo_academico
+
+WHERE nombre_grupo LIKE CONCAT('%',p_dato,'%');
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_grupo(
+
+IN p_id_grupo INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM grupo_academico
+
+WHERE id_grupo=p_id_grupo;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_grupo(
+
+IN p_id_grupo INT,
+IN p_nombre_grupo VARCHAR(50),
+IN p_turno ENUM('Mañana','Tarde','Noche'),
+IN p_id_ciclo INT,
+IN p_id_sede INT
+
+)
+
+BEGIN
+
+UPDATE grupo_academico
+
+SET
+
+nombre_grupo=p_nombre_grupo,
+turno=p_turno,
+id_ciclo=p_id_ciclo,
+id_sede=p_id_sede
+
+WHERE id_grupo=p_id_grupo;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_grupo(
+
+IN p_id_grupo INT
+
+)
+
+BEGIN
+
+DELETE FROM grupo_academico
+
+WHERE id_grupo=p_id_grupo;
+
+END //
+
+DELIMITER ;
