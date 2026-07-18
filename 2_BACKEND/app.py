@@ -9,7 +9,7 @@ from routes.estudiantes import estudiante_bp
 from routes.docente import docente_bp
 from routes.asignacion import asignacion_bp
 from routes.curso import curso_bp
-
+from routes.ciclo import ciclo_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -24,7 +24,7 @@ app.register_blueprint(estudiante_bp)
 app.register_blueprint(docente_bp)
 app.register_blueprint(asignacion_bp)
 app.register_blueprint(curso_bp)
-
+app.register_blueprint(ciclo_bp)
 # Clave para firmar tokens
 app.config["JWT_SECRET_KEY"] = "academia_einstein_secret"
 
