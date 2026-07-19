@@ -16,7 +16,7 @@ from routes.matricula import matricula_bp
 from routes.asistencia import asistencia_bp
 from routes.evaluacion import evaluacion_bp
 from routes.calificacion import calificacion_bp
-
+from routes.pago_estudiante import pago_estudiante_bp
 
 
 
@@ -41,6 +41,7 @@ app.register_blueprint(matricula_bp)
 app.register_blueprint(asistencia_bp)
 app.register_blueprint(evaluacion_bp)
 app.register_blueprint(calificacion_bp)
+app.register_blueprint(pago_estudiante_bp)
 
 
 # Clave para firmar tokens
