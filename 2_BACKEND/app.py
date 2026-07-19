@@ -15,6 +15,11 @@ from routes.horario import horario_bp
 from routes.matricula import matricula_bp
 from routes.asistencia import asistencia_bp
 from routes.evaluacion import evaluacion_bp
+from routes.calificacion import calificacion_bp
+
+
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -34,7 +39,8 @@ app.register_blueprint(grupo_bp)
 app.register_blueprint(horario_bp)
 app.register_blueprint(matricula_bp)
 app.register_blueprint(asistencia_bp)
-app.register_blueprint(evaluacion_bp) 
+app.register_blueprint(evaluacion_bp)
+app.register_blueprint(calificacion_bp)
 
 
 # Clave para firmar tokens
