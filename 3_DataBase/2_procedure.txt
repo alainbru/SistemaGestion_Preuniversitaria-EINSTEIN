@@ -1590,7 +1590,7 @@ p_id_grupo
 END //
 
 DELIMITER ;
-DROP PROCEDURE IF EXISTS sp_listar_matriculas;
+
 
 DELIMITER //
 
@@ -1615,7 +1615,8 @@ c.id_ciclo,
 c.nombre AS ciclo,
 
 g.id_grupo,
-g.nombre AS grupo
+g.nombre_grupo AS grupo,
+g.turno
 
 
 FROM matricula m
@@ -1682,36 +1683,34 @@ WHERE id_matricula=p_id_matricula;
 END //
 
 DELIMITER ;
-
-
 DELIMITER //
 
 CREATE PROCEDURE sp_actualizar_matricula(
-
-IN p_id_matricula INT,
-IN p_estado ENUM('Vigente','Anulada'),
-IN p_id_grupo INT
-
+    IN p_id_matricula INT,
+    IN p_fecha_matricula DATE,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_id_estudiante INT,
+    IN p_id_ciclo INT,
+    IN p_id_grupo INT,
+    IN p_estado VARCHAR(20) -- Asegúrate de usar el tipo de dato correcto para tu columna 'estado'
 )
-
 BEGIN
 
-
-UPDATE matricula
-
-SET
-
-estado=p_estado,
-id_grupo=p_id_grupo
-
-
-WHERE id_matricula=p_id_matricula;
-
+    UPDATE matricula
+    SET
+        fecha_matricula = p_fecha_matricula,
+        fecha_inicio = p_fecha_inicio,
+        fecha_fin = p_fecha_fin,
+        id_estudiante = p_id_estudiante,
+        id_ciclo = p_id_ciclo,
+        id_grupo = p_id_grupo,
+        estado = p_estado
+    WHERE id_matricula = p_id_matricula;
 
 END //
 
 DELIMITER ;
-
 
 
 DELIMITER //
@@ -1731,6 +1730,1095 @@ SET estado='Anulada'
 
 
 WHERE id_matricula=p_id_matricula;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_asistencia(
+
+IN p_fecha DATE,
+IN p_estado_asistencia ENUM('Presente','Falta','Tardanza'),
+IN p_id_estudiante INT,
+IN p_id_grupo INT
+
+)
+
+BEGIN
+
+INSERT INTO asistencia(
+
+fecha,
+estado_asistencia,
+id_estudiante,
+id_grupo
+
+)
+
+VALUES(
+
+p_fecha,
+p_estado_asistencia,
+p_id_estudiante,
+p_id_grupo
+
+);
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_asistencias()
+
+BEGIN
+
+SELECT
+
+a.id_asistencia,
+a.fecha,
+a.estado_asistencia,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+g.nombre_grupo,
+g.turno
+
+FROM asistencia a
+
+INNER JOIN estudiante e
+ON a.id_estudiante=e.id_estudiante
+
+INNER JOIN grupo_academico g
+ON a.id_grupo=g.id_grupo;
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_asistencia(
+
+IN p_id_asistencia INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM asistencia
+
+WHERE id_asistencia=p_id_asistencia;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_asistencia_estudiante(
+
+IN p_id_estudiante INT
+
+)
+
+BEGIN
+
+SELECT
+
+*
+
+FROM asistencia
+
+WHERE id_estudiante=p_id_estudiante
+
+ORDER BY fecha DESC;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_asistencia_grupo(
+
+IN p_id_grupo INT
+
+)
+
+BEGIN
+
+SELECT
+
+a.id_asistencia,
+a.fecha,
+a.estado_asistencia,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante
+
+FROM asistencia a
+
+INNER JOIN estudiante e
+ON a.id_estudiante=e.id_estudiante
+
+WHERE a.id_grupo=p_id_grupo
+
+ORDER BY a.fecha DESC;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_asistencia(
+
+IN p_id_asistencia INT,
+IN p_estado_asistencia ENUM('Presente','Falta','Tardanza')
+
+)
+
+BEGIN
+
+UPDATE asistencia
+
+SET
+
+estado_asistencia=p_estado_asistencia
+
+WHERE id_asistencia=p_id_asistencia;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_asistencia(
+
+IN p_id_asistencia INT
+
+)
+
+BEGIN
+
+DELETE FROM asistencia
+
+WHERE id_asistencia=p_id_asistencia;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_evaluacion(
+
+IN p_nombre VARCHAR(100),
+IN p_tipo ENUM('Simulacro','Practica Calificada','Examen'),
+IN p_fecha DATE,
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+INSERT INTO evaluacion(
+
+nombre,
+tipo,
+fecha,
+id_curso
+
+)
+
+VALUES(
+
+p_nombre,
+p_tipo,
+p_fecha,
+p_id_curso
+
+);
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_evaluaciones()
+
+BEGIN
+
+SELECT
+
+e.id_evaluacion,
+e.nombre,
+e.tipo,
+e.fecha,
+
+c.nombre_curso
+
+FROM evaluacion e
+
+INNER JOIN curso c
+
+ON e.id_curso=c.id_curso;
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_evaluacion(
+
+IN p_id_evaluacion INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM evaluacion
+
+WHERE id_evaluacion=p_id_evaluacion;
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_evaluaciones_curso(
+
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+SELECT
+
+id_evaluacion,
+nombre,
+tipo,
+fecha
+
+FROM evaluacion
+
+WHERE id_curso=p_id_curso
+
+ORDER BY fecha;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_evaluacion(
+
+IN p_id_evaluacion INT,
+IN p_nombre VARCHAR(100),
+IN p_tipo ENUM('Simulacro','Practica Calificada','Examen'),
+IN p_fecha DATE,
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+UPDATE evaluacion
+
+SET
+
+nombre=p_nombre,
+tipo=p_tipo,
+fecha=p_fecha,
+id_curso=p_id_curso
+
+WHERE id_evaluacion=p_id_evaluacion;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_evaluacion(
+
+IN p_id_evaluacion INT
+
+)
+
+BEGIN
+
+DELETE FROM evaluacion
+
+WHERE id_evaluacion=p_id_evaluacion;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_calificacion(
+
+IN p_nota DECIMAL(5,2),
+IN p_id_estudiante INT,
+IN p_id_evaluacion INT
+
+)
+
+BEGIN
+
+INSERT INTO calificacion(
+
+nota,
+id_estudiante,
+id_evaluacion
+
+)
+
+VALUES(
+
+p_nota,
+p_id_estudiante,
+p_id_evaluacion
+
+);
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_calificaciones()
+
+BEGIN
+
+SELECT
+
+c.id_calificacion,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+ev.nombre AS evaluacion,
+
+cu.nombre_curso,
+
+c.nota
+
+FROM calificacion c
+
+INNER JOIN estudiante e
+ON c.id_estudiante=e.id_estudiante
+
+INNER JOIN evaluacion ev
+ON c.id_evaluacion=ev.id_evaluacion
+
+INNER JOIN curso cu
+ON ev.id_curso=cu.id_curso;
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_calificacion(
+
+IN p_id_calificacion INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM calificacion
+
+WHERE id_calificacion=p_id_calificacion;
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_calificaciones_estudiante(
+
+IN p_id_estudiante INT
+
+)
+
+BEGIN
+
+SELECT
+
+ev.nombre,
+ev.tipo,
+cu.nombre_curso,
+c.nota
+
+FROM calificacion c
+
+INNER JOIN evaluacion ev
+ON c.id_evaluacion=ev.id_evaluacion
+
+INNER JOIN curso cu
+ON ev.id_curso=cu.id_curso
+
+WHERE c.id_estudiante=p_id_estudiante
+
+ORDER BY cu.nombre_curso;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_calificaciones_estudiante(
+
+IN p_id_estudiante INT
+
+)
+
+BEGIN
+
+SELECT
+
+ev.nombre,
+ev.tipo,
+cu.nombre_curso,
+c.nota
+
+FROM calificacion c
+
+INNER JOIN evaluacion ev
+ON c.id_evaluacion=ev.id_evaluacion
+
+INNER JOIN curso cu
+ON ev.id_curso=cu.id_curso
+
+WHERE c.id_estudiante=p_id_estudiante
+
+ORDER BY cu.nombre_curso;
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_calificaciones_evaluacion(
+
+IN p_id_evaluacion INT
+
+)
+
+BEGIN
+
+SELECT
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante,
+
+c.nota
+
+FROM calificacion c
+
+INNER JOIN estudiante e
+ON c.id_estudiante=e.id_estudiante
+
+WHERE c.id_evaluacion=p_id_evaluacion
+
+ORDER BY estudiante;
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_calificacion(
+
+IN p_id_calificacion INT,
+IN p_nota DECIMAL(5,2)
+
+)
+
+BEGIN
+
+UPDATE calificacion
+
+SET
+
+nota=p_nota
+
+WHERE id_calificacion=p_id_calificacion;
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_calificacion(
+
+IN p_id_calificacion INT
+
+)
+
+BEGIN
+
+DELETE FROM calificacion
+
+WHERE id_calificacion=p_id_calificacion;
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_pago_estudiante(
+
+IN p_fecha_pago DATE,
+IN p_monto DECIMAL(10,2),
+IN p_concepto VARCHAR(100),
+IN p_periodo_pagado VARCHAR(50),
+IN p_fecha_inicio_pago DATE,
+IN p_fecha_fin_pago DATE,
+IN p_id_estudiante INT
+
+)
+
+BEGIN
+
+INSERT INTO pago_estudiante(
+
+fecha_pago,
+monto,
+concepto,
+periodo_pagado,
+fecha_inicio_pago,
+fecha_fin_pago,
+estado,
+id_estudiante
+
+)
+
+VALUES(
+
+p_fecha_pago,
+p_monto,
+p_concepto,
+p_periodo_pagado,
+p_fecha_inicio_pago,
+p_fecha_fin_pago,
+'Pendiente',
+p_id_estudiante
+
+);
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_pagos_estudiante()
+
+BEGIN
+
+SELECT
+
+p.id_pago,
+p.fecha_pago,
+p.monto,
+p.concepto,
+p.periodo_pagado,
+p.fecha_inicio_pago,
+p.fecha_fin_pago,
+p.estado,
+
+CONCAT(
+e.nombres,' ',
+e.apellidos
+) AS estudiante
+
+
+FROM pago_estudiante p
+
+
+INNER JOIN estudiante e
+
+ON p.id_estudiante=e.id_estudiante;
+
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_pagos_por_estudiante(
+
+IN p_id_estudiante INT
+
+)
+
+BEGIN
+
+SELECT
+
+id_pago,
+fecha_pago,
+monto,
+concepto,
+periodo_pagado,
+fecha_inicio_pago,
+fecha_fin_pago,
+estado
+
+FROM pago_estudiante
+
+WHERE id_estudiante=p_id_estudiante
+
+ORDER BY fecha_pago DESC;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_pago_estudiante(
+
+IN p_id_pago INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM pago_estudiante
+
+WHERE id_pago=p_id_pago;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_pago_estudiante(
+
+IN p_id_pago INT,
+IN p_monto DECIMAL(10,2),
+IN p_concepto VARCHAR(100),
+IN p_estado ENUM('Pendiente','Cancelado'),
+IN p_fecha_fin_pago DATE
+
+)
+
+BEGIN
+
+UPDATE pago_estudiante
+
+SET
+
+monto=p_monto,
+concepto=p_concepto,
+estado=p_estado,
+fecha_fin_pago=p_fecha_fin_pago
+
+
+WHERE id_pago=p_id_pago;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_pago_docente(
+
+IN p_fecha_pago DATE,
+IN p_monto DECIMAL(10,2),
+IN p_concepto VARCHAR(100),
+IN p_id_docente INT
+
+)
+
+BEGIN
+
+INSERT INTO pago_docente(
+
+fecha_pago,
+monto,
+concepto,
+estado,
+id_docente
+
+)
+
+VALUES(
+
+p_fecha_pago,
+p_monto,
+p_concepto,
+'Pendiente',
+p_id_docente
+
+);
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_pagos_docente()
+
+BEGIN
+
+SELECT
+
+p.id_pago_docente,
+
+p.fecha_pago,
+
+p.monto,
+
+p.concepto,
+
+p.estado,
+
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente
+
+
+FROM pago_docente p
+
+
+INNER JOIN docente d
+
+ON p.id_docente=d.id_docente;
+
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_pagos_por_docente(
+
+IN p_id_docente INT
+
+)
+
+BEGIN
+
+SELECT
+
+id_pago_docente,
+fecha_pago,
+monto,
+concepto,
+estado
+
+FROM pago_docente
+
+
+WHERE id_docente=p_id_docente
+
+
+ORDER BY fecha_pago DESC;
+
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_pago_docente(
+
+IN p_id_pago_docente INT
+
+)
+
+BEGIN
+
+SELECT *
+
+FROM pago_docente
+
+WHERE id_pago_docente=p_id_pago_docente;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_pago_docente(
+
+IN p_id_pago_docente INT,
+IN p_monto DECIMAL(10,2),
+IN p_concepto VARCHAR(100),
+IN p_estado ENUM('Pendiente','Cancelado')
+
+)
+
+BEGIN
+
+UPDATE pago_docente
+
+SET
+
+monto=p_monto,
+concepto=p_concepto,
+estado=p_estado
+
+
+WHERE id_pago_docente=p_id_pago_docente;
+
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_pagos_docente_pendientes()
+
+BEGIN
+
+SELECT
+
+p.id_pago_docente,
+
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente,
+
+
+p.monto,
+
+p.concepto
+
+
+FROM pago_docente p
+
+
+INNER JOIN docente d
+
+ON p.id_docente=d.id_docente
+
+
+WHERE p.estado='Pendiente';
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_total_pagado_docente(
+
+IN p_id_docente INT
+
+)
+
+BEGIN
+
+SELECT
+
+SUM(monto) AS total_pagado
+
+
+FROM pago_docente
+
+
+WHERE id_docente=p_id_docente
+
+AND estado='Cancelado';
 
 
 END //

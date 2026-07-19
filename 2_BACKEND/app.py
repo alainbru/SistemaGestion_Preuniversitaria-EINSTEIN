@@ -18,7 +18,7 @@ from routes.evaluacion import evaluacion_bp
 from routes.calificacion import calificacion_bp
 from routes.pago_estudiante import pago_estudiante_bp
 from routes.pago_docente import pago_docente_bp
-
+from routes.reporte import reportes_bp
 
 
 app = Flask(__name__)
@@ -43,6 +43,7 @@ app.register_blueprint(evaluacion_bp)
 app.register_blueprint(calificacion_bp)
 app.register_blueprint(pago_estudiante_bp)
 app.register_blueprint(pago_docente_bp)
+app.register_blueprint(reportes_bp)
 
 # Clave para firmar tokens
 app.config["JWT_SECRET_KEY"] = "academia_einstein_secret"
