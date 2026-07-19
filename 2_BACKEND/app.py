@@ -12,6 +12,7 @@ from routes.curso import curso_bp
 from routes.ciclo import ciclo_bp
 from routes.grupo import grupo_bp
 from routes.horario import horario_bp
+from routes.matricula import matricula_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -29,7 +30,7 @@ app.register_blueprint(curso_bp)
 app.register_blueprint(ciclo_bp)
 app.register_blueprint(grupo_bp)
 app.register_blueprint(horario_bp)
-
+app.register_blueprint(matricula_bp)
 
 # Clave para firmar tokens
 app.config["JWT_SECRET_KEY"] = "academia_einstein_secret"

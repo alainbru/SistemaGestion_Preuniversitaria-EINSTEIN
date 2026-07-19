@@ -97,10 +97,10 @@ AFTER INSERT ON matricula
 FOR EACH ROW
 BEGIN
 
-
 INSERT INTO registro_actividad(
 accion,
-descripcion
+descripcion,
+id_usuario
 )
 
 VALUES(
@@ -108,9 +108,9 @@ VALUES(
 CONCAT(
 'Se creó matrícula para estudiante ID ',
 NEW.id_estudiante
-)
+),
+1
 );
-
 
 END //
 

@@ -1307,3 +1307,432 @@ WHERE id_grupo=p_id_grupo;
 END //
 
 DELIMITER ;
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_horario(
+
+IN p_dia VARCHAR(20),
+IN p_hora_inicio TIME,
+IN p_hora_fin TIME,
+IN p_id_docente_curso INT,
+IN p_id_aula INT
+
+)
+
+BEGIN
+
+INSERT INTO horario(
+dia,
+hora_inicio,
+hora_fin,
+id_docente_curso,
+id_aula
+)
+
+VALUES(
+p_dia,
+p_hora_inicio,
+p_hora_fin,
+p_id_docente_curso,
+p_id_aula
+);
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_horarios()
+
+BEGIN
+
+SELECT
+
+h.id_horario,
+
+h.dia,
+
+h.hora_inicio,
+
+h.hora_fin,
+
+
+CONCAT(
+d.nombres,' ',
+d.apellidos
+) AS docente,
+
+
+c.nombre_curso AS curso,
+
+
+a.nombre AS aula,
+
+
+s.nombre AS sede
+
+
+FROM horario h
+
+
+INNER JOIN docente_curso dc
+ON h.id_docente_curso=dc.id_docente_curso
+
+
+INNER JOIN docente d
+ON dc.id_docente=d.id_docente
+
+
+INNER JOIN curso c
+ON dc.id_curso=c.id_curso
+
+
+INNER JOIN aula a
+ON h.id_aula=a.id_aula
+
+
+INNER JOIN sede s
+ON a.id_sede=s.id_sede;
+
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_horarios_docente(
+
+IN p_id_docente INT
+
+)
+
+BEGIN
+
+
+SELECT
+
+h.*
+
+FROM horario h
+
+
+INNER JOIN docente_curso dc
+
+ON h.id_docente_curso=dc.id_docente_curso
+
+
+WHERE dc.id_docente=p_id_docente;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_horarios_curso(
+
+IN p_id_curso INT
+
+)
+
+BEGIN
+
+
+SELECT
+
+h.*
+
+FROM horario h
+
+
+INNER JOIN docente_curso dc
+
+ON h.id_docente_curso=dc.id_docente_curso
+
+
+WHERE dc.id_curso=p_id_curso;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_horario(
+
+IN p_id_horario INT,
+IN p_dia VARCHAR(20),
+IN p_hora_inicio TIME,
+IN p_hora_fin TIME,
+IN p_id_docente_curso INT,
+IN p_id_aula INT
+
+)
+
+BEGIN
+
+UPDATE horario
+
+SET
+
+dia=p_dia,
+hora_inicio=p_hora_inicio,
+hora_fin=p_hora_fin,
+id_docente_curso=p_id_docente_curso,
+id_aula=p_id_aula
+
+
+WHERE id_horario=p_id_horario;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_eliminar_horario(
+
+IN p_id_horario INT
+
+)
+
+BEGIN
+
+DELETE FROM horario
+
+WHERE id_horario=p_id_horario;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_registrar_matricula(
+
+IN p_fecha_matricula DATE,
+IN p_fecha_inicio DATE,
+IN p_fecha_fin DATE,
+IN p_id_estudiante INT,
+IN p_id_ciclo INT,
+IN p_id_grupo INT
+
+)
+
+BEGIN
+
+
+INSERT INTO matricula(
+
+fecha_matricula,
+fecha_inicio,
+fecha_fin,
+estado,
+estado_pago,
+id_estudiante,
+id_ciclo,
+id_grupo
+
+)
+
+VALUES(
+
+p_fecha_matricula,
+p_fecha_inicio,
+p_fecha_fin,
+'Vigente',
+'Pendiente',
+p_id_estudiante,
+p_id_ciclo,
+p_id_grupo
+
+);
+
+
+END //
+
+DELIMITER ;
+DROP PROCEDURE IF EXISTS sp_listar_matriculas;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_listar_matriculas()
+
+BEGIN
+
+SELECT
+
+m.id_matricula,
+m.fecha_matricula,
+m.fecha_inicio,
+m.fecha_fin,
+m.estado,
+m.estado_pago,
+
+e.id_estudiante,
+e.nombres,
+e.apellidos,
+
+c.id_ciclo,
+c.nombre AS ciclo,
+
+g.id_grupo,
+g.nombre AS grupo
+
+
+FROM matricula m
+
+INNER JOIN estudiante e
+ON m.id_estudiante = e.id_estudiante
+
+INNER JOIN ciclo_academico c
+ON m.id_ciclo = c.id_ciclo
+
+INNER JOIN grupo_academico g
+ON m.id_grupo = g.id_grupo;
+
+
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_matriculas_estudiante(
+
+IN p_id_estudiante INT
+
+)
+
+BEGIN
+
+
+SELECT *
+
+FROM matricula
+
+
+WHERE id_estudiante=p_id_estudiante;
+
+
+END //
+
+DELIMITER ;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_obtener_matricula(
+
+IN p_id_matricula INT
+
+)
+
+BEGIN
+
+
+SELECT *
+
+FROM matricula
+
+
+WHERE id_matricula=p_id_matricula;
+
+
+END //
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_actualizar_matricula(
+
+IN p_id_matricula INT,
+IN p_estado ENUM('Vigente','Anulada'),
+IN p_id_grupo INT
+
+)
+
+BEGIN
+
+
+UPDATE matricula
+
+SET
+
+estado=p_estado,
+id_grupo=p_id_grupo
+
+
+WHERE id_matricula=p_id_matricula;
+
+
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_anular_matricula(
+
+IN p_id_matricula INT
+
+)
+
+BEGIN
+
+
+UPDATE matricula
+
+SET estado='Anulada'
+
+
+WHERE id_matricula=p_id_matricula;
+
+
+END //
+
+DELIMITER ;
