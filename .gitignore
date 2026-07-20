@@ -19,3 +19,28 @@ env/
 
 # Logs
 *.log
+
+# ==========================================
+# React / Node.js / Vite
+# ==========================================
+
+# Dependencias (LA MÁS IMPORTANTE - miles de archivos pesados)
+node_modules/
+
+# Carpeta de producción / compilación
+dist/
+build/
+
+# Archivos y carpetas de variables de entorno locales
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Caché de empaquetadores y herramientas de formateo
+.vite/
+.eslintcache
+
+# Archivos basura del sistema operativo
+.DS_Store
+Thumbs.db
