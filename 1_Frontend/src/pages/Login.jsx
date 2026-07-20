@@ -19,7 +19,8 @@ function Login(){
             });
 
             console.log(respuesta.data);
-
+            localStorage.setItem("token", respuesta.data.token);
+            localStorage.setItem("usuario", JSON.stringify(respuesta.data.usuario));
             alert("Login correcto");
 
             navigate("/dashboard");
@@ -29,20 +30,13 @@ function Login(){
                 "token",
                 respuesta.data.token
             );
-
-
         }
         catch(error){
-
             console.log(error);
-
             alert("Usuario o contraseña incorrectos");
 
         }
-
-
     }
-
     return(
         <div className="login-container">
             <div className="login-card">
@@ -53,54 +47,29 @@ function Login(){
                     Inicio de Sesión
                 </h3>
                 <form onSubmit={iniciarSesion}>
-
-
-                    <label>
-                        Usuario
-                    </label>
-
-
+                    <label>Usuario</label>
                     <input
-
                     type="text"
-
                     value={usuario}
-
                     onChange={
                         (e)=>setUsuario(e.target.value)
                     }
-
                     />
-
-                    <label>
-                        Contraseña
-                    </label>
+                    <label>Contraseña</label>
                     <input
-
                     type="password"
-
                     value={password}
-
                     onChange={
                         (e)=>setPassword(e.target.value)
                     }
 
                     />
                     <button>Ingresar</button>
-
-
-
                 </form>
-
-
             </div>
 
-
         </div>
-
     )
-
-
 }
 
 
