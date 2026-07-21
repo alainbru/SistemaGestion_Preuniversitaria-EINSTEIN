@@ -1,17 +1,41 @@
+import Layout from "../components/Layout";
+
+
 function Dashboard(){
+
+
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+    );
+
 
     return (
 
-        <div>
+        <Layout>
+
+
             <h1>
-                Dashboard Academia Einstein
+                Dashboard
             </h1>
+
+
+            <h2>
+                Bienvenido {usuario?.nombre_usuario}
+            </h2>
+
+
             <p>
-                Bienvenido al sistema
+                Rol:
+                {usuario?.rol}
             </p>
-        </div>
-    )
+
+
+        </Layout>
+
+    );
+
 
 }
+
 
 export default Dashboard;

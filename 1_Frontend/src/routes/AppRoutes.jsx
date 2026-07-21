@@ -1,16 +1,16 @@
 import {
     BrowserRouter,
     Routes,
-    Route,
-    Navigate
+    Route
 } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Estudiantes from "./pages/Estudiantes";
-import ProtectedRoute from "./routes/ProtectedRoute";
 
-function App(){
+import Login from "../pages/Login";
+import Dashboard from "../pages/Dashboard";
+import Estudiantes from "../pages/Estudiantes";
+import ProtectedRoute from "./ProtectedRoute";
+
+function AppRoutes(){
 
     return (
 
@@ -19,14 +19,10 @@ function App(){
             <Routes>
 
                 <Route
-                    path="/"
-                    element={<Login/>}
-                />
-
-                <Route
                     path="/login"
                     element={<Login/>}
                 />
+
 
                 <Route
                     path="/dashboard"
@@ -37,6 +33,7 @@ function App(){
                     }
                 />
 
+
                 <Route
                     path="/estudiantes"
                     element={
@@ -46,10 +43,6 @@ function App(){
                     }
                 />
 
-                <Route
-                    path="*"
-                    element={<Navigate to="/login" replace/>}
-                />
 
             </Routes>
 
@@ -59,4 +52,5 @@ function App(){
 
 }
 
-export default App;
+
+export default AppRoutes;

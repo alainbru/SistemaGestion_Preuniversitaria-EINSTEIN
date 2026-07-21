@@ -14,32 +14,46 @@ estudiante_bp = Blueprint(
 @estudiante_bp.route("/", methods=["POST"])
 def registrar_estudiante():
 
-    datos = request.json
+    try:
+        datos = request.json
 
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
+        # Validar campos requeridos
+        campos_requeridos = ["DNI", "nombres", "apellidos", "fecha_nacimiento", "telefono", "correo", "direccion"]
+        for campo in campos_requeridos:
+            if campo not in datos or datos[campo] == "":
+                return jsonify({
+                    "error": f"El campo '{campo}' es requerido"
+                }), 400
 
-    cursor.callproc(
-        "sp_registrar_estudiante",
-        [
-            datos["DNI"],
-            datos["nombres"],
-            datos["apellidos"],
-            datos["fecha_nacimiento"],
-            datos["telefono"],
-            datos["correo"],
-            datos["direccion"]
-        ]
-    )
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
 
-    conexion.commit()
+        cursor.callproc(
+            "sp_registrar_estudiante",
+            [
+                datos["DNI"],
+                datos["nombres"],
+                datos["apellidos"],
+                datos["fecha_nacimiento"],
+                datos["telefono"],
+                datos["correo"],
+                datos["direccion"]
+            ]
+        )
 
-    cursor.close()
-    conexion.close()
+        conexion.commit()
 
-    return jsonify({
-        "mensaje": "Estudiante registrado correctamente"
-    }),201
+        cursor.close()
+        conexion.close()
+
+        return jsonify({
+            "mensaje": "Estudiante registrado correctamente"
+        }), 201
+
+    except Exception as e:
+        return jsonify({
+            "error": f"Error al registrar estudiante: {str(e)}"
+        }), 500
 
 
 

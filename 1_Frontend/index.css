@@ -1,0 +1,60 @@
+.layout{
+
+    display:flex;
+    min-height:100vh;
+
+}
+
+
+.sidebar{
+
+    width:240px;
+    background:#1e293b;
+    color:white;
+    padding:20px;
+
+}
+
+
+.sidebar h2{
+
+    text-align:center;
+
+}
+
+
+.sidebar a{
+
+    display:block;
+    color:white;
+    text-decoration:none;
+    padding:12px;
+    margin:5px 0;
+    border-radius:8px;
+
+}
+
+
+.sidebar a:hover{
+
+    background:#334155;
+
+}
+
+
+.sidebar button{
+
+    margin-top:30px;
+    width:100%;
+    padding:10px;
+    cursor:pointer;
+
+}
+
+
+.contenido{
+
+    flex:1;
+    padding:30px;
+
+}
