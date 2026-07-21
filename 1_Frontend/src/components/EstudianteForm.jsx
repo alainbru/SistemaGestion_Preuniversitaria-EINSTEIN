@@ -1,20 +1,24 @@
-import { useState } from "react";
-import { registrarEstudiante } from "../api/estudianteApi";
+import { useEffect, useState } from "react";
+import { 
+    registrarEstudiante,
+    actualizarEstudiante
+} from "../api/estudianteApi";
 
 
-function EstudianteForm({ cerrarFormulario, actualizarLista }) {
+function EstudianteForm({ cerrarFormulario, actualizarLista, estudianteEditar}) {
 
     const [datos, setDatos] = useState({
 
-        DNI: "",
-        nombres: "",
-        apellidos: "",
-        fecha_nacimiento: "",
-        telefono: "",
-        correo: "",
-        direccion: ""
+    DNI: "",
+    nombres: "",
+    apellidos: "",
+    fecha_nacimiento: "",
+    telefono: "",
+    correo: "",
+    direccion: "",
+    estado_estudiante: "ACTIVO"
 
-    });
+    }); 
 
     const [error, setError] = useState("");
     const [cargando, setCargando] = useState(false);
@@ -38,12 +42,27 @@ function EstudianteForm({ cerrarFormulario, actualizarLista }) {
 
         try {
 
-            const respuesta = await registrarEstudiante(datos);
-            
+            let respuesta;
+
+            if(estudianteEditar){
+
+                respuesta = await actualizarEstudiante(
+                    estudianteEditar.id_estudiante,
+                    datos
+                );
+
+            }else{
+
+                respuesta = await registrarEstudiante(datos);
+
+            }            
             console.log("Respuesta del servidor:", respuesta);
 
-            alert("Estudiante registrado correctamente");
-
+            alert(
+                estudianteEditar
+                ? "Estudiante actualizado correctamente"
+                : "Estudiante registrado correctamente"
+            );
             actualizarLista();
             cerrarFormulario();
 
@@ -65,13 +84,36 @@ function EstudianteForm({ cerrarFormulario, actualizarLista }) {
 
     };
 
+useEffect(() => {
 
+        if (estudianteEditar) {
+
+            setDatos({
+                DNI: estudianteEditar.DNI,
+                nombres: estudianteEditar.nombres,
+                apellidos: estudianteEditar.apellidos,
+                fecha_nacimiento: estudianteEditar.fecha_nacimiento,
+                telefono: estudianteEditar.telefono,
+                correo: estudianteEditar.correo,
+                direccion: estudianteEditar.direccion,
+                estado_estudiante: estudianteEditar.estado_estudiante
+            });
+
+        }
+
+    }, [estudianteEditar]);
+    
     return (
 
         <form onSubmit={guardarEstudiante}>
 
-            <h2>Nuevo Estudiante</h2>
-
+                <h2>
+                {
+                estudianteEditar 
+                ? "Editar Estudiante" 
+                : "Nuevo Estudiante"
+                }
+                </h2>
             {error && <div style={{color: "red", marginBottom: "10px"}}>{error}</div>}
 
 
@@ -163,6 +205,5 @@ function EstudianteForm({ cerrarFormulario, actualizarLista }) {
     );
 
 }
-
 
 export default EstudianteForm;

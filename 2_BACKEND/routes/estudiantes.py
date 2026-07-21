@@ -142,7 +142,7 @@ def actualizar_estudiante(id_estudiante):
             datos["telefono"],
             datos["correo"],
             datos["direccion"],
-            datos["estado_estudiante"]
+            datos.get("estado_estudiante", "ACTIVO")
         ]
     )
 
