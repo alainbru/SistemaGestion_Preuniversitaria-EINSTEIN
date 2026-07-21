@@ -10,7 +10,7 @@ import Dashboard from "../pages/Dashboard";
 import Estudiantes from "../pages/Estudiantes";
 import ProtectedRoute from "./ProtectedRoute";
 import Docentes from "../pages/Docentes";
-
+import Cursos from "../pages/Cursos";
 
 function AppRoutes(){
 
@@ -50,6 +50,15 @@ function AppRoutes(){
                     element={
                         <ProtectedRoute>
                             <Docentes/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                 <Route
+                    path="/cursos"
+                    element={
+                        <ProtectedRoute>
+                            <Cursos/>
                         </ProtectedRoute>
                     }
                 />
