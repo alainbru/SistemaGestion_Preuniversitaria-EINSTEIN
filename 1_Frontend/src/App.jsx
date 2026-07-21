@@ -8,6 +8,9 @@ import {
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Estudiantes from "./pages/Estudiantes";
+import Docentes from "./pages/Docentes";
+
+
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App(){
@@ -42,6 +45,15 @@ function App(){
                     element={
                         <ProtectedRoute>
                             <Estudiantes/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/docentes"
+                    element={
+                        <ProtectedRoute>
+                            <Docentes/>
                         </ProtectedRoute>
                     }
                 />

@@ -9,6 +9,8 @@ import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Estudiantes from "../pages/Estudiantes";
 import ProtectedRoute from "./ProtectedRoute";
+import Docentes from "../pages/Docentes";
+
 
 function AppRoutes(){
 
@@ -39,6 +41,15 @@ function AppRoutes(){
                     element={
                         <ProtectedRoute>
                             <Estudiantes/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/docentes"
+                    element={
+                        <ProtectedRoute>
+                            <Docentes/>
                         </ProtectedRoute>
                     }
                 />
