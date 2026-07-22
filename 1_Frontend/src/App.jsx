@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import Estudiantes from "./pages/Estudiantes";
 import Docentes from "./pages/Docentes";
 import Cursos from "./pages/Cursos";
+import Matriculas from "./pages/Matriculas";
+import PagosDocentes from "./pages/PagosDocentes";
+import PagosEstudiantes from "./pages/PagosEstudiantes";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -63,6 +66,33 @@ function App(){
                     element={
                         <ProtectedRoute>
                             <Cursos/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/matriculas"
+                    element={
+                        <ProtectedRoute>
+                            <Matriculas/>
+                        </ProtectedRoute>
+                    }
+                />
+                
+                <Route
+                    path="/pagos-docentes"
+                    element={
+                        <ProtectedRoute>
+                            <PagosDocentes/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/pagos-estudiantes"
+                    element={
+                        <ProtectedRoute>
+                            <PagosEstudiantes/>
                         </ProtectedRoute>
                     }
                 />

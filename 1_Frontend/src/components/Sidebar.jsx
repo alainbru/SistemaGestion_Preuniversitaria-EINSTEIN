@@ -53,8 +53,13 @@ function Sidebar(){
                 </Link>
 
 
-                <Link to="/pagos">
-                    💰 Pagos
+                <Link to="/pagos-estudiantes">
+                    💰 Pagos Estudiantes
+                </Link>
+
+
+                <Link to="/pagos-docentes">
+                    👨‍🏫 Pagos Docentes
                 </Link>
 
 

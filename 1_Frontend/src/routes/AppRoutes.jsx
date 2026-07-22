@@ -11,6 +11,8 @@ import Estudiantes from "../pages/Estudiantes";
 import ProtectedRoute from "./ProtectedRoute";
 import Docentes from "../pages/Docentes";
 import Cursos from "../pages/Cursos";
+import Matriculas from "../pages/Matriculas";
+import PagosDocentes from "../pages/PagosDocentes";
 
 function AppRoutes(){
 
@@ -59,6 +61,24 @@ function AppRoutes(){
                     element={
                         <ProtectedRoute>
                             <Cursos/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/matriculas"
+                    element={
+                        <ProtectedRoute>
+                            <Matriculas/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/pagos-docentes"
+                    element={
+                        <ProtectedRoute>
+                            <PagosDocentes/>
                         </ProtectedRoute>
                     }
                 />
