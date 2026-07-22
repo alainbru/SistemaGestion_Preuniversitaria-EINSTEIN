@@ -1,45 +1,53 @@
 import { useEffect, useState } from "react";
-import { registrarPagoEstudiante, actualizarPagoEstudiante } from "../api/pagoEstudianteApi";
-import { listarEstudiantes } from "../api/estudianteApi";
+import {
+  registrarPagoDocente,
+  actualizarPagoDocente,
+} from "../api/pagoDocenteApi";
+import { listarDocentes } from "../api/docenteApi";
 
-function PagoEstudianteForm({ cerrarFormulario, actualizarLista, pagoEditar }) {
-  const [datos, setDatos] = useState({
-    fecha_pago: "",
-    monto: "",
-    concepto: "",
-    periodo_pagado: "",
-    fecha_inicio_pago: "",
-    fecha_fin_pago: "",
-    id_estudiante: "",
-  });
+const PAGO_INICIAL = {
+  fecha_pago: new Date().toISOString().split("T")[0],
+  monto: "",
+  concepto: "",
+  id_docente: "",
+};
 
-  const [estudiantes, setEstudiantes] = useState([]);
+// Auxiliar para formatear fecha YYYY-MM-DD en inputs tipo date
+const formatearFecha = (fecha) => {
+  if (!fecha) return "";
+  return String(fecha).split("T")[0];
+};
+
+function PagoDocenteForm({ cerrarFormulario, actualizarLista, pagoEditar }) {
+  const [datos, setDatos] = useState(PAGO_INICIAL);
+  const [docentes, setDocentes] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    cargarEstudiantes();
+    cargarDocentes();
   }, []);
 
   useEffect(() => {
     if (pagoEditar) {
       setDatos({
-        fecha_pago: pagoEditar.fecha_pago || "",
+        fecha_pago: formatearFecha(pagoEditar.fecha_pago),
         monto: pagoEditar.monto || "",
         concepto: pagoEditar.concepto || "",
-        periodo_pagado: pagoEditar.periodo_pagado || "",
-        fecha_inicio_pago: pagoEditar.fecha_inicio_pago || "",
-        fecha_fin_pago: pagoEditar.fecha_fin_pago || "",
-        id_estudiante: pagoEditar.id_estudiante || "",
+        id_docente: pagoEditar.id_docente || "",
       });
+    } else {
+      setDatos(PAGO_INICIAL);
     }
   }, [pagoEditar]);
 
-  const cargarEstudiantes = async () => {
+  const cargarDocentes = async () => {
     try {
-      const respuesta = await listarEstudiantes();
-      setEstudiantes(respuesta.data);
-    } catch (error) {
-      console.log(error);
+      const respuesta = await listarDocentes();
+      setDocentes(respuesta.data || []);
+    } catch (err) {
+      console.error("Error al cargar lista de docentes:", err);
+      setError("No se pudo cargar la lista de docentes.");
     }
   };
 
@@ -53,40 +61,43 @@ function PagoEstudianteForm({ cerrarFormulario, actualizarLista, pagoEditar }) {
   const guardar = async (e) => {
     e.preventDefault();
     setCargando(true);
+    setError("");
 
     try {
       if (pagoEditar) {
-        await actualizarPagoEstudiante(pagoEditar.id_pago, {
+        await actualizarPagoDocente(pagoEditar.id_pago_docente, {
+          fecha_pago: datos.fecha_pago,
           monto: datos.monto,
           concepto: datos.concepto,
-          estado: pagoEditar.estado,
-          fecha_fin_pago: datos.fecha_fin_pago,
+          id_docente: datos.id_docente,
         });
       } else {
-        await registrarPagoEstudiante(datos);
+        await registrarPagoDocente(datos);
       }
 
-      alert(
-        pagoEditar
-          ? "Pago actualizado correctamente"
-          : "Pago registrado correctamente"
-      );
-
-      actualizarLista();
+      await actualizarLista();
       cerrarFormulario();
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.error("Error al guardar el pago del docente:", err);
+      setError(
+        err.response?.data?.mensaje ||
+          err.response?.data?.error ||
+          "Error al guardar el pago del docente."
+      );
     } finally {
       setCargando(false);
     }
   };
 
   return (
-    <form onSubmit={guardar}>
+    <form className="formulario" onSubmit={guardar}>
       <h2>
-        {pagoEditar ? "Editar Pago Estudiante" : "Nuevo Pago Estudiante"}
+        {pagoEditar ? "✏️ Editar Pago Docente" : "💼 Nuevo Pago Docente"}
       </h2>
 
+      {error && <p className="error">{error}</p>}
+
+      <label>Fecha de Pago</label>
       <input
         type="date"
         name="fecha_pago"
@@ -95,6 +106,7 @@ function PagoEstudianteForm({ cerrarFormulario, actualizarLista, pagoEditar }) {
         required
       />
 
+      <label>Monto (S/.)</label>
       <input
         type="number"
         step="0.01"
@@ -105,61 +117,47 @@ function PagoEstudianteForm({ cerrarFormulario, actualizarLista, pagoEditar }) {
         required
       />
 
+      <label>Concepto</label>
       <input
         type="text"
         name="concepto"
-        placeholder="Concepto"
+        placeholder="Ejm: Honorarios Mayo / Horas Dictadas"
         value={datos.concepto}
         onChange={handleChange}
+        required
       />
 
-      <input
-        type="text"
-        name="periodo_pagado"
-        placeholder="Periodo pagado"
-        value={datos.periodo_pagado}
-        onChange={handleChange}
-      />
-
-      <label>Fecha inicio pago</label>
-      <input
-        type="date"
-        name="fecha_inicio_pago"
-        value={datos.fecha_inicio_pago}
-        onChange={handleChange}
-      />
-
-      <label>Fecha fin pago</label>
-      <input
-        type="date"
-        name="fecha_fin_pago"
-        value={datos.fecha_fin_pago}
-        onChange={handleChange}
-      />
-
+      <label>Docente</label>
       <select
-        name="id_estudiante"
-        value={datos.id_estudiante}
+        name="id_docente"
+        value={datos.id_docente}
         onChange={handleChange}
         required
       >
-        <option value="">Seleccione estudiante</option>
-        {estudiantes.map((e) => (
-          <option key={e.id_estudiante} value={e.id_estudiante}>
-            {e.nombres} {e.apellidos}
+        <option value="">-- Seleccione docente --</option>
+        {docentes.map((d) => (
+          <option key={d.id_docente} value={d.id_docente}>
+            {d.nombres} {d.apellidos}
           </option>
         ))}
       </select>
 
-      <button disabled={cargando}>
-        {cargando ? "Guardando..." : "Guardar"}
-      </button>
+      <div className="botones-form">
+        <button className="btn-guardar" type="submit" disabled={cargando}>
+          {cargando ? "Guardando..." : "Guardar"}
+        </button>
 
-      <button type="button" onClick={cerrarFormulario}>
-        Cancelar
-      </button>
+        <button
+          className="btn-cancelar"
+          type="button"
+          onClick={cerrarFormulario}
+          disabled={cargando}
+        >
+          Cancelar
+        </button>
+      </div>
     </form>
   );
 }
 
-export default PagoEstudianteForm;
+export default PagoDocenteForm;

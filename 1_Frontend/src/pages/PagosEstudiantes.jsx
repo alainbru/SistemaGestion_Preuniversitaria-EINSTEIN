@@ -1,94 +1,129 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import PagoEstudianteForm from "../components/PagoEstudianteForm";
-import { listarPagosEstudiante } from "../api/pagoEstudianteApi";
+import Modal from "../components/Modal";
+import PagoDocenteForm from "../components/PagoDocenteForm";
+import { listarPagosDocente } from "../api/pagoDocenteApi";
+import "../styles/Pagos.css";
 
-function PagosEstudiantes() {
+function PagosDocentes() {
   const [pagos, setPagos] = useState([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [pagoEditar, setPagoEditar] = useState(null);
 
-  useEffect(() => {
-    cargarPagos();
+  const cargarPagos = useCallback(async () => {
+    try {
+      const respuesta = await listarPagosDocente();
+      setPagos(respuesta.data || []);
+    } catch (error) {
+      console.error("Error al cargar pagos de docentes:", error);
+    }
   }, []);
 
-  const cargarPagos = async () => {
-    try {
-      const respuesta = await listarPagosEstudiante();
-      setPagos(respuesta.data);
-    } catch (error) {
-      console.log(error);
-    }
+  useEffect(() => {
+    cargarPagos();
+  }, [cargarPagos]);
+
+  const handleNuevoPago = () => {
+    setPagoEditar(null);
+    setMostrarFormulario(true);
   };
 
-  const editar = (pago) => {
+  const handleEditar = (pago) => {
     setPagoEditar(pago);
     setMostrarFormulario(true);
   };
 
-  const abrirNuevoFormulario = () => {
-    setPagoEditar(null);
-    setMostrarFormulario(true);
-  };
-
-  const cerrarFormulario = () => {
+  const handleCerrarFormulario = () => {
     setMostrarFormulario(false);
     setPagoEditar(null);
   };
 
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "-";
+    return String(fecha).split("T")[0];
+  };
+
   return (
     <Layout>
-      <h1>Pagos de Estudiantes</h1>
+      <div className="page-header">
+        <div>
+          <h1>👨‍🏫 Pagos de Docentes</h1>
+          <p>Registro y control de honorarios y pagos al personal docente.</p>
+        </div>
+      </div>
 
-      <button onClick={abrirNuevoFormulario}>
-        + Nuevo pago estudiante
-      </button>
+      <div className="barra-acciones">
+        <button className="btn-nuevo" onClick={handleNuevoPago}>
+          + Nuevo pago docente
+        </button>
+      </div>
+
+      <div className="card">
+        <table className="tabla">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Docente</th>
+              <th>Concepto</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pagos.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                  No hay pagos de docentes registrados.
+                </td>
+              </tr>
+            ) : (
+              pagos.map((p) => (
+                <tr key={p.id_pago_docente}>
+                  <td>{formatearFecha(p.fecha_pago)}</td>
+                  <td>
+                    <strong>{p.docente || "-"}</strong>
+                  </td>
+                  <td>{p.concepto}</td>
+                  <td>
+                    <strong>S/. {Number(p.monto).toFixed(2)}</strong>
+                  </td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        p.estado === "Pagado" ? "badge-activo" : "badge-pendiente"
+                      }`}
+                    >
+                      {p.estado === "Pagado" ? "🟢 Pagado" : "🟡 Pendiente"}
+                    </span>
+                  </td>
+                  <td className="acciones-tabla">
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleEditar(p)}
+                      title="Editar Pago"
+                    >
+                      ✏️
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {mostrarFormulario && (
-        <PagoEstudianteForm
-          cerrarFormulario={cerrarFormulario}
-          actualizarLista={cargarPagos}
-          pagoEditar={pagoEditar}
-        />
+        <Modal cerrar={handleCerrarFormulario}>
+          <PagoDocenteForm
+            cerrarFormulario={handleCerrarFormulario}
+            actualizarLista={cargarPagos}
+            pagoEditar={pagoEditar}
+          />
+        </Modal>
       )}
-
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Fecha pago</th>
-            <th>Monto</th>
-            <th>Concepto</th>
-            <th>Periodo</th>
-            <th>Inicio</th>
-            <th>Fin</th>
-            <th>Estado</th>
-            <th>Estudiante</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {pagos.map((p) => (
-            <tr key={p.id_pago}>
-              <td>{p.fecha_pago}</td>
-              <td>S/. {p.monto}</td>
-              <td>{p.concepto}</td>
-              <td>{p.periodo_pagado}</td>
-              <td>{p.fecha_inicio_pago}</td>
-              <td>{p.fecha_fin_pago}</td>
-              <td>{p.estado}</td>
-             <td>
-                    {p.estudiante}
-            </td>
-              <td>
-                <button onClick={() => editar(p)}>Editar</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </Layout>
   );
 }
 
-export default PagosEstudiantes;
+export default PagosDocentes;
