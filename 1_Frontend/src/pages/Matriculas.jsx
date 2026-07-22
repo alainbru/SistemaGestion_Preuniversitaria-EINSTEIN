@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import MatriculaForm from "../components/MatriculaForm";
 import { listarMatriculas, anularMatricula } from "../api/matriculaApi";
+import Modal from "../components/Modal";
 
 function Matriculas() {
   const [matriculas, setMatriculas] = useState([]);
@@ -56,13 +57,22 @@ function Matriculas() {
         + Nueva matrícula
       </button>
 
-      {mostrarFormulario && (
+      {
+mostrarFormulario && (
+
+    <Modal
+        cerrar={cerrarFormulario}
+    >
+
         <MatriculaForm
-          cerrarFormulario={cerrarFormulario}
-          actualizarLista={cargarMatriculas}
-          matriculaEditar={matriculaEditar}
+
+            cerrarFormulario={cerrarFormulario}
+            actualizarLista={cargarMatriculas}
+            matriculaEditar={matriculaEditar}
         />
-      )}
+    </Modal>
+)
+}
 
       <table border="1">
         <thead>

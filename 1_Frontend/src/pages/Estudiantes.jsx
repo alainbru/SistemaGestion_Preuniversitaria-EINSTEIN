@@ -1,197 +1,162 @@
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Layout from "../components/Layout";
 import EstudianteForm from "../components/EstudianteForm";
-
 import {
-    listarEstudiantes,
-    eliminarEstudiante,
-    actualizarEstudiante,
-    buscarEstudiante
+  listarEstudiantes,
+  eliminarEstudiante,
+  buscarEstudiante,
 } from "../api/estudianteApi";
 
-
 function Estudiantes() {
+  const [estudiantes, setEstudiantes] = useState([]);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [estudianteEditar, setEstudianteEditar] = useState(null);
+  const [estudianteConsultar, setEstudianteConsultar] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
 
-    const [estudiantes, setEstudiantes] = useState([]);
-    const [mostrarFormulario, setMostrarFormulario] = useState(false);
-    const [estudianteEditar, setEstudianteEditar] = useState(null);
-    const [busqueda, setBusqueda] = useState("");
-    useEffect(() => {
-        cargarEstudiantes();
-    }, []);
+  const location = useLocation();
 
+  // Carga o busca estudiantes según el término ingresado
+  const cargarEstudiantes = useCallback(async () => {
+    try {
+      const query = busqueda.trim();
+      const respuesta = query
+        ? await buscarEstudiante(query)
+        : await listarEstudiantes();
 
-    const cargarEstudiantes = async () => {
+      setEstudiantes(respuesta.data ?? []);
+    } catch (error) {
+      console.error("Error al obtener estudiantes:", error);
+    }
+  }, [busqueda]);
 
-        try {
+  // Ejecuta carga inicial y búsqueda dinámica
+  useEffect(() => {
+    cargarEstudiantes();
+  }, [cargarEstudiantes]);
 
-            const respuesta = await listarEstudiantes();
-            setEstudiantes(respuesta.data);
+  // Limpia el estado del formulario/modal si se navega a otra ruta
+  useEffect(() => {
+    setMostrarFormulario(false);
+    setEstudianteEditar(null);
+    setEstudianteConsultar(null);
+    setBusqueda("");
+  }, [location.pathname]);
 
-        } catch (error) {
+  // Acciones
+  const handleEliminar = async (id) => {
+    const confirmar = window.confirm("¿Desea retirar este estudiante?");
+    if (!confirmar) return;
 
-            console.log(error);
+    try {
+      await eliminarEstudiante(id);
+      cargarEstudiantes();
+    } catch (error) {
+      console.error("Error al eliminar estudiante:", error);
+    }
+  };
 
-        }
-
-    };
-
-
-    const eliminar = async (id) => {
-        console.log("ID A ELIMINAR:", id);
-        const confirmar = window.confirm(
-            "¿Desea retirar este estudiante?"
-            
-        );
-
-
-        if (!confirmar) {
-            return;
-        }
-
-
-        try {
-
-            await eliminarEstudiante(id);
-
-            cargarEstudiantes();
-
-        } catch (error) {
-
-            console.log(error);
-
-        }
-
-    };
-
-    const editar = (estudiante) => {
+  const handleEditar = (estudiante) => {
     setEstudianteEditar(estudiante);
     setMostrarFormulario(true);
+  };
 
-    };
+  const handleNuevoEstudiante = () => {
+    setEstudianteEditar(null);
+    setMostrarFormulario(true);
+  };
 
-    const buscar = async () => {
+  const handleCerrarFormulario = () => {
+    setMostrarFormulario(false);
+    setEstudianteEditar(null);
+  };
 
-        if (busqueda.trim() === "") {
-            cargarEstudiantes();
-            return;
-        }
-        try {
-            const respuesta = await buscarEstudiante(busqueda);
-            setEstudiantes(respuesta.data);
-        } catch (error) {
-            console.log(error);
-        }
+  return (
+    <Layout>
+      <h1>Gestión de Estudiantes</h1>
 
-    };
+      {/* Buscador */}
+      <input
+        type="text"
+        placeholder="Buscar por DNI, nombre o apellido..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
 
-    useEffect(() => {
+      <br />
+      <br />
 
-    buscar();
+      <button onClick={handleNuevoEstudiante}>+ Nuevo estudiante</button>
 
-    }, [busqueda]);
- 
-    return (
+      {/* Formulario Crear / Editar */}
+      {mostrarFormulario && (
+        <EstudianteForm
+          cerrarFormulario={handleCerrarFormulario}
+          actualizarLista={cargarEstudiantes}
+          estudianteEditar={estudianteEditar}
+        />
+      )}
 
-        <Layout>
+      {/* Tabla de Estudiantes */}
+      <table border="1">
+        <thead>
+          <tr>
+            <th>DNI</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {estudiantes.map((e) => (
+            <tr key={e.id_estudiante}>
+              <td>{e.DNI}</td>
+              <td>{e.nombres}</td>
+              <td>{e.apellidos}</td>
+              <td>
+                {e.estado_estudiante === "ACTIVO" ? "🟢 Activo" : "🔴 Inactivo"}
+              </td>
+              <td>
+                <button onClick={() => handleEditar(e)}>Editar</button>
+                <button onClick={() => setEstudianteConsultar(e)}>
+                  Consultar
+                </button>
+                <button onClick={() => handleEliminar(e.id_estudiante)}>
+                  Retirar
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-            <h1>
-                Gestión de Estudiantes
-            </h1>
-            <input
-                type="text"
-                placeholder="Buscar por DNI, nombre o apellido..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-            />
+      {/* Detalle Estudiante */}
+      {estudianteConsultar && (
+        <div>
+          <h2>Detalle estudiante</h2>
+          <p>
+            <strong>DNI:</strong> {estudianteConsultar.DNI}
+          </p>
+          <p>
+            <strong>Nombre:</strong> {estudianteConsultar.nombres}{" "}
+            {estudianteConsultar.apellidos}
+          </p>
+          <p>
+            <strong>Correo:</strong> {estudianteConsultar.correo}
+          </p>
+          <p>
+            <strong>Estado:</strong> {estudianteConsultar.estado_estudiante}
+          </p>
 
-            <button
-                onClick={() => {
-                    setEstudianteEditar(null);
-                    setMostrarFormulario(true);
-                }}
-            >
-                + Nuevo estudiante
-            </button>
-
-
-
-            {
-                mostrarFormulario && (
-
-                    <EstudianteForm
-                        cerrarFormulario={() => {
-                            setMostrarFormulario(false);
-                            setEstudianteEditar(null);
-                        }}
-
-                        actualizarLista={cargarEstudiantes}
-
-                        estudianteEditar={estudianteEditar}
-                    />
-
-                )
-            }
-
-
-
-            <table border="1">
-
-                <thead>
-
-                    <tr>
-                        <th>DNI</th>
-                        <th>Nombres</th>
-                        <th>Apellidos</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                        <th>Acción</th>
-                    </tr>
-
-                </thead>
-
-
-
-                <tbody>
-
-                    {
-                        estudiantes.map((e) => (
-
-                            <tr key={e.id_estudiante}>
-
-                                <td>{e.DNI}</td>
-                                <td>{e.nombres}</td>
-                                <td>{e.apellidos}</td>
-                                <td>{e.telefono}</td>
-                                <td>{e.correo}</td>
-                                <td>
-                                <button
-                                    onClick={() => editar(e)}
-                                >
-                                    Editar
-                                </button>
-                                <button
-                                    onClick={() => eliminar(e.id_estudiante)}
-                                >
-                                    Retirar
-                                </button>
-                            </td>
-                            </tr>
-
-                        ))
-                    }
-
-                </tbody>
-
-            </table>
-
-
-        </Layout>
-
-    );
-
+          <button onClick={() => setEstudianteConsultar(null)}>
+            Cerrar
+          </button>
+        </div>
+      )}
+    </Layout>
+  );
 }
-
 
 export default Estudiantes;

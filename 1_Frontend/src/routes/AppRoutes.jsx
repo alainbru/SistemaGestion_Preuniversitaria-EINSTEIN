@@ -13,6 +13,9 @@ import Docentes from "../pages/Docentes";
 import Cursos from "../pages/Cursos";
 import Matriculas from "../pages/Matriculas";
 import PagosDocentes from "../pages/PagosDocentes";
+import PagosEstudiantes from "../pages/PagosEstudiantes";
+import Asistencias from "../pages/Asistencias";
+
 
 function AppRoutes(){
 
@@ -79,6 +82,24 @@ function AppRoutes(){
                     element={
                         <ProtectedRoute>
                             <PagosDocentes/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/pagos-estudiantes"
+                    element={
+                        <ProtectedRoute>
+                            <PagosEstudiantes/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/asistencia"
+                    element={
+                        <ProtectedRoute>
+                            <Asistencias/>
                         </ProtectedRoute>
                     }
                 />

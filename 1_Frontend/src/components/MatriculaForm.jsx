@@ -3,6 +3,7 @@ import { registrarMatricula, actualizarMatricula } from "../api/matriculaApi";
 import { listarEstudiantes } from "../api/estudianteApi";
 import { listarCiclos } from "../api/cicloApi";
 import { listarGrupos } from "../api/grupoApi";
+import Modal from "../components/Modal";
 
 function MatriculaForm({ cerrarFormulario, actualizarLista, matriculaEditar }) {
   const [datos, setDatos] = useState({
@@ -59,9 +60,24 @@ function MatriculaForm({ cerrarFormulario, actualizarLista, matriculaEditar }) {
     });
   };
 
-  const guardar = async (e) => {
+const guardar = async (e) => {
+
     e.preventDefault();
-    setCargando(true);
+
+
+    if(
+        !datos.id_estudiante ||
+        !datos.id_ciclo ||
+        !datos.id_grupo
+    ){
+
+        alert(
+            "Debe seleccionar estudiante, ciclo y grupo"
+        );
+
+        return;
+
+    }
 
     try {
       if (matriculaEditar) {
@@ -88,30 +104,43 @@ function MatriculaForm({ cerrarFormulario, actualizarLista, matriculaEditar }) {
   return (
     <form onSubmit={guardar}>
       <h2>{matriculaEditar ? "Editar Matrícula" : "Nueva Matrícula"}</h2>
-        <p>Fecha Matricula</p>
-      <input
-        type="date"
-        name="fecha_matricula"
-        value={datos.fecha_matricula}
-        onChange={handleChange}
-      />
-        <p>INICIO</p>
+       <label>
+         Fecha matrícula
+        </label>
 
-      <input
-        type="date"
-        name="fecha_inicio"
-        value={datos.fecha_inicio}
-        onChange={handleChange}
-      />
-        <p>FIN</p>
+        <input
+            type="date"
+            name="fecha_matricula"
+            value={datos.fecha_matricula}
+            onChange={handleChange}
+            required
+        />
 
-      <input
-        type="date"
-        name="fecha_fin"
-        value={datos.fecha_fin}
-        onChange={handleChange}
-      />
 
+        <label>
+            Fecha inicio
+        </label>
+
+        <input
+            type="date"
+            name="fecha_inicio"
+            value={datos.fecha_inicio}
+            onChange={handleChange}
+            required
+        />
+
+
+        <label>
+            Fecha fin
+        </label>
+
+        <input
+            type="date"
+            name="fecha_fin"
+            value={datos.fecha_fin}
+            onChange={handleChange}
+            required
+        />
       <select
         name="id_estudiante"
         value={datos.id_estudiante}
@@ -119,9 +148,14 @@ function MatriculaForm({ cerrarFormulario, actualizarLista, matriculaEditar }) {
       >
         <option value="">Seleccione estudiante</option>
         {estudiantes.map((e) => (
-          <option key={e.id_estudiante} value={e.id_estudiante}>
-            {e.nombres} {e.apellidos}
-          </option>
+        <option 
+            key={e.id_estudiante} 
+            value={e.id_estudiante}
+            >
+
+            {e.DNI} - {e.nombres} {e.apellidos}
+
+            </option>
         ))}
       </select>
 
@@ -132,9 +166,15 @@ function MatriculaForm({ cerrarFormulario, actualizarLista, matriculaEditar }) {
       >
         <option value="">Seleccione ciclo</option>
         {ciclos.map((c) => (
-          <option key={c.id_ciclo} value={c.id_ciclo}>
-            {c.nombre}
-          </option>
+         <option 
+            key={c.id_ciclo}
+            value={c.id_ciclo}
+            >
+
+            {c.nombre} 
+            ({c.fecha_inicio} - {c.fecha_fin})
+
+            </option>
         ))}
       </select>
 
@@ -146,7 +186,7 @@ function MatriculaForm({ cerrarFormulario, actualizarLista, matriculaEditar }) {
         <option value="">Seleccione grupo</option>
         {grupos.map((g) => (
           <option key={g.id_grupo} value={g.id_grupo}>
-            {g.nombre_grupo} - {g.turno}
+            {g.nombre_grupo} - Turno {g.turno}
           </option>
         ))}
       </select>

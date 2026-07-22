@@ -19,7 +19,7 @@ from routes.calificacion import calificacion_bp
 from routes.pago_estudiante import pago_estudiante_bp
 from routes.pago_docente import pago_docente_bp
 from routes.reporte import reportes_bp
-
+from routes.dashboard import dashboard_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -44,6 +44,7 @@ app.register_blueprint(calificacion_bp)
 app.register_blueprint(pago_estudiante_bp)
 app.register_blueprint(pago_docente_bp)
 app.register_blueprint(reportes_bp)
+app.register_blueprint(dashboard_bp)
 
 # Clave para firmar tokens
 app.config["JWT_SECRET_KEY"] = "academia_einstein_secret"

@@ -1,209 +1,180 @@
 import { useEffect, useState } from "react";
-import { 
-    registrarEstudiante,
-    actualizarEstudiante
+import {
+  registrarEstudiante,
+  actualizarEstudiante,
 } from "../api/estudianteApi";
 
 
-function EstudianteForm({ cerrarFormulario, actualizarLista, estudianteEditar}) {
-
-    const [datos, setDatos] = useState({
-
-    DNI: "",
-    nombres: "",
-    apellidos: "",
-    fecha_nacimiento: "",
-    telefono: "",
-    correo: "",
-    direccion: "",
-    estado_estudiante: "ACTIVO"
-
-    }); 
-
-    const [error, setError] = useState("");
-    const [cargando, setCargando] = useState(false);
+import "../styles/EstudianteForm.css";
 
 
-    const handleChange = (e) => {
+const ESTADO_INICIAL = {
+  DNI: "",
+  nombres: "",
+  apellidos: "",
+  fecha_nacimiento: "",
+  telefono: "",
+  correo: "",
+  direccion: "",
+  estado_estudiante: "ACTIVO",
+};
 
-        setDatos({
-            ...datos,
-            [e.target.name]: e.target.value
-        });
+function EstudianteForm({
+  cerrarFormulario,
+  actualizarLista,
+  estudianteEditar,
+}) {
+  const [datos, setDatos] = useState(ESTADO_INICIAL);
+  const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-    };
+  useEffect(() => {
+    if (estudianteEditar) {
+      setDatos({
+        DNI: estudianteEditar.DNI || "",
+        nombres: estudianteEditar.nombres || "",
+        apellidos: estudianteEditar.apellidos || "",
+        // Limpia la fecha a formato YYYY-MM-DD para el input tipo date
+        fecha_nacimiento: estudianteEditar.fecha_nacimiento
+          ? estudianteEditar.fecha_nacimiento.split("T")[0]
+          : "",
+        telefono: estudianteEditar.telefono || "",
+        correo: estudianteEditar.correo || "",
+        direccion: estudianteEditar.direccion || "",
+        estado_estudiante: estudianteEditar.estado_estudiante || "ACTIVO",
+      });
+    } else {
+      setDatos(ESTADO_INICIAL);
+    }
+  }, [estudianteEditar]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDatos((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-    const guardarEstudiante = async (e) => {
+  const guardarEstudiante = async (e) => {
+    e.preventDefault();
+    setError("");
+    setCargando(true);
 
-        e.preventDefault();
-        setError("");
-        setCargando(true);
+    try {
+      if (estudianteEditar) {
+        await actualizarEstudiante(estudianteEditar.id_estudiante, datos);
+      } else {
+        await registrarEstudiante(datos);
+      }
 
-        try {
+      // Cerrar formulario primero
+      cerrarFormulario();
+      
+      // Luego actualizar la lista
+      await actualizarLista();
+    } catch (err) {
+      console.error(err);
+      const mensaje =
+        err.response?.data?.error ||
+        err.response?.data?.mensaje ||
+        "Error al guardar estudiante";
+      setError(mensaje);
+      setCargando(false);
+    }
+  };
 
-            let respuesta;
+  return (
+    <div className="modal-fondo">
+      <div className="modal-contenido">
+        <h2>
+          {estudianteEditar ? "Editar Estudiante" : "Nuevo Estudiante"}
+        </h2>
 
-            if(estudianteEditar){
-
-                respuesta = await actualizarEstudiante(
-                    estudianteEditar.id_estudiante,
-                    datos
-                );
-
-            }else{
-
-                respuesta = await registrarEstudiante(datos);
-
-            }            
-            console.log("Respuesta del servidor:", respuesta);
-
-            alert(
-                estudianteEditar
-                ? "Estudiante actualizado correctamente"
-                : "Estudiante registrado correctamente"
-            );
-            actualizarLista();
-            cerrarFormulario();
-
-        } catch (error) {
-
-            console.error("Error completo:", error);
-            
-            const mensajeError = error.response?.data?.error || 
-                               error.response?.data?.mensaje ||
-                               error.message || 
-                               "Error desconocido al registrar estudiante";
-            
-            setError(mensajeError);
-            alert(`Error: ${mensajeError}`);
-
-        } finally {
-            setCargando(false);
-        }
-
-    };
-
-useEffect(() => {
-
-        if (estudianteEditar) {
-
-            setDatos({
-                DNI: estudianteEditar.DNI,
-                nombres: estudianteEditar.nombres,
-                apellidos: estudianteEditar.apellidos,
-                fecha_nacimiento: estudianteEditar.fecha_nacimiento,
-                telefono: estudianteEditar.telefono,
-                correo: estudianteEditar.correo,
-                direccion: estudianteEditar.direccion,
-                estado_estudiante: estudianteEditar.estado_estudiante
-            });
-
-        }
-
-    }, [estudianteEditar]);
-    
-    return (
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
         <form onSubmit={guardarEstudiante}>
+          <input
+            type="text"
+            name="DNI"
+            placeholder="DNI"
+            value={datos.DNI}
+            onChange={handleChange}
+            required
+          />
 
-                <h2>
-                {
-                estudianteEditar 
-                ? "Editar Estudiante" 
-                : "Nuevo Estudiante"
-                }
-                </h2>
-            {error && <div style={{color: "red", marginBottom: "10px"}}>{error}</div>}
+          <input
+            type="text"
+            name="nombres"
+            placeholder="Nombres"
+            value={datos.nombres}
+            onChange={handleChange}
+            required
+          />
 
+          <input
+            type="text"
+            name="apellidos"
+            placeholder="Apellidos"
+            value={datos.apellidos}
+            onChange={handleChange}
+            required
+          />
 
-            <input
-                type="text"
-                name="DNI"
-                placeholder="DNI"
-                value={datos.DNI}
-                onChange={handleChange}
-                required
-            />
+          <label htmlFor="fecha_nacimiento">Fecha nacimiento</label>
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            name="fecha_nacimiento"
+            value={datos.fecha_nacimiento}
+            onChange={handleChange}
+            required
+          />
 
+          <input
+            type="text"
+            name="telefono"
+            placeholder="Teléfono"
+            value={datos.telefono}
+            onChange={handleChange}
+            required
+          />
 
-            <input
-                type="text"
-                name="nombres"
-                placeholder="Nombres"
-                value={datos.nombres}
-                onChange={handleChange}
-                required
-            />
+          <input
+            type="email"
+            name="correo"
+            placeholder="Correo"
+            value={datos.correo}
+            onChange={handleChange}
+            required
+          />
 
+          <input
+            type="text"
+            name="direccion"
+            placeholder="Dirección"
+            value={datos.direccion}
+            onChange={handleChange}
+            required
+          />
 
-            <input
-                type="text"
-                name="apellidos"
-                placeholder="Apellidos"
-                value={datos.apellidos}
-                onChange={handleChange}
-                required
-            />
-
-
-            <input
-                type="date"
-                name="fecha_nacimiento"
-                value={datos.fecha_nacimiento}
-                onChange={handleChange}
-                required
-            />
-
-
-            <input
-                type="text"
-                name="telefono"
-                placeholder="Teléfono"
-                value={datos.telefono}
-                onChange={handleChange}
-                required
-            />
-
-
-            <input
-                type="email"
-                name="correo"
-                placeholder="Correo"
-                value={datos.correo}
-                onChange={handleChange}
-                required
-            />
-
-
-            <input
-                type="text"
-                name="direccion"
-                placeholder="Dirección"
-                value={datos.direccion}
-                onChange={handleChange}
-                required
-            />
-
-
+          <div>
             <button type="submit" disabled={cargando}>
-                {cargando ? "Guardando..." : "Guardar"}
+              {cargando ? "Guardando..." : "Guardar"}
             </button>
 
-
-            <button 
-                type="button"
-                onClick={cerrarFormulario}
-                disabled={cargando}
+            <button
+              type="button"
+              onClick={cerrarFormulario}
+              disabled={cargando}
             >
-                Cancelar
+              Cancelar
             </button>
-
-
+          </div>
         </form>
-
-    );
-
+      </div>
+    </div>
+  );
 }
 
 export default EstudianteForm;

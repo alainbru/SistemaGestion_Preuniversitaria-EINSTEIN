@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import CursoForm from "../components/CursoForm";
 import { listarCursos, eliminarCurso, buscarCurso } from "../api/cursoApi";
+import Modal from "../components/Modal";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -78,13 +79,28 @@ function Cursos() {
         + Nuevo curso
       </button>
 
-      {mostrarFormulario && (
+      {
+        mostrarFormulario && (
+
+        <Modal
+            cerrar={cerrarFormulario}
+        >
+
         <CursoForm
-          cerrarFormulario={cerrarFormulario}
-          actualizarLista={cargarCursos}
-          cursoEditar={cursoEditar}
+
+            cerrarFormulario={cerrarFormulario}
+
+            actualizarLista={cargarCursos}
+
+            cursoEditar={cursoEditar}
+
         />
-      )}
+
+
+        </Modal>
+
+        )
+        }
 
       <table border="1">
         <thead>
