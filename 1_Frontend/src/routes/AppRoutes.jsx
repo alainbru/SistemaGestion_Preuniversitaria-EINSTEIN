@@ -16,7 +16,7 @@ import PagosDocentes from "../pages/PagosDocentes";
 import PagosEstudiantes from "../pages/PagosEstudiantes";
 import Asistencias from "../pages/Asistencias";
 import LogPagos from "../pages/LogPagos";
-
+import HistorialPagos from "../pages/HistorialPagos";
 
 function AppRoutes(){
 
@@ -105,15 +105,16 @@ function AppRoutes(){
                     }
                 />
 
-                <Route
-                    path="/log-pagos"
+         
+
+               <Route
+                    path="/historial-pagos"
                     element={
                         <ProtectedRoute>
-                            <LogPagos/>
+                            <HistorialPagos/>
                         </ProtectedRoute>
                     }
                 />
-
 
             </Routes>
 

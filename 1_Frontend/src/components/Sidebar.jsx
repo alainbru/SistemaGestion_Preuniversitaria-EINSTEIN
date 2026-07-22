@@ -80,7 +80,7 @@ function Sidebar(){
                 </Link>
 
 
-                <Link to="/log-pagos">
+                <Link to="/historial-pagos">
                     💳 Historial Pagos
                 </Link>
 

@@ -22,7 +22,7 @@ from routes.reporte import reportes_bp
 from routes.dashboard import dashboard_bp
 from routes.actividad import actividad_bp
 from routes.log_pago import log_pago_bp
-
+from routes.historial_pagos import historial_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -50,7 +50,7 @@ app.register_blueprint(reportes_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(actividad_bp)
 app.register_blueprint(log_pago_bp)
-
+app.register_blueprint(historial_bp)
 # Clave para firmar tokens
 app.config["JWT_SECRET_KEY"] = "academia_einstein_secret"
 

@@ -1,8 +1,8 @@
 import {
-    BrowserRouter,
-    Routes,
-    Route,
-    Navigate
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate
 } from "react-router-dom";
 
 import Login from "./pages/Login";
@@ -14,117 +14,108 @@ import Matriculas from "./pages/Matriculas";
 import PagosDocentes from "./pages/PagosDocentes";
 import PagosEstudiantes from "./pages/PagosEstudiantes";
 import Asistencias from "./pages/Asistencias";
-
-import LogPagos from "./pages/LogPagos";
+import HistorialPagos from "./pages/HistorialPagos";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
-function App(){
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Rutas Públicas */}
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
 
-    return (
+        {/* Rutas Protegidas */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-        <BrowserRouter>
+        <Route
+          path="/estudiantes"
+          element={
+            <ProtectedRoute>
+              <Estudiantes />
+            </ProtectedRoute>
+          }
+        />
 
-            <Routes>
+        <Route
+          path="/docentes"
+          element={
+            <ProtectedRoute>
+              <Docentes />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/"
-                    element={<Login/>}
-                />
+        <Route
+          path="/cursos"
+          element={
+            <ProtectedRoute>
+              <Cursos />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/login"
-                    element={<Login/>}
-                />
+        <Route
+          path="/matriculas"
+          element={
+            <ProtectedRoute>
+              <Matriculas />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard/>
-                        </ProtectedRoute>
-                    }
-                />
+        <Route
+          path="/pagos-docentes"
+          element={
+            <ProtectedRoute>
+              <PagosDocentes />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/estudiantes"
-                    element={
-                        <ProtectedRoute>
-                            <Estudiantes/>
-                        </ProtectedRoute>
-                    }
-                />
+        <Route
+          path="/pagos-estudiantes"
+          element={
+            <ProtectedRoute>
+              <PagosEstudiantes />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/docentes"
-                    element={
-                        <ProtectedRoute>
-                            <Docentes/>
-                        </ProtectedRoute>
-                    }
-                />
+        <Route
+          path="/historial-pagos"
+          element={
+            <ProtectedRoute>
+              <HistorialPagos />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/cursos"
-                    element={
-                        <ProtectedRoute>
-                            <Cursos/>
-                        </ProtectedRoute>
-                    }
-                />
+        <Route
+          path="/asistencia"
+          element={
+            <ProtectedRoute>
+              <Asistencias />
+            </ProtectedRoute>
+          }
+        />
 
-                <Route
-                    path="/matriculas"
-                    element={
-                        <ProtectedRoute>
-                            <Matriculas/>
-                        </ProtectedRoute>
-                    }
-                />
-                
-                <Route
-                    path="/pagos-docentes"
-                    element={
-                        <ProtectedRoute>
-                            <PagosDocentes/>
-                        </ProtectedRoute>
-                    }
-                />
+  
+        
 
-                <Route
-                    path="/pagos-estudiantes"
-                    element={
-                        <ProtectedRoute>
-                            <PagosEstudiantes/>
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/asistencia"
-                    element={
-                        <ProtectedRoute>
-                            <Asistencias/>
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route 
-                path="/log-pagos" 
-                element={<LogPagos/>}
-                />
-
-                <Route
-                    path="*"
-                    element={<Navigate to="/login" replace/>}
-                />
-
-            </Routes>
-
-        </BrowserRouter>
-
-    );
-
+        {/* Ruta por defecto/fallback para URLs desconocidas */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
