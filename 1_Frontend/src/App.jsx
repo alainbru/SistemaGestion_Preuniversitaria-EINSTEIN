@@ -15,6 +15,7 @@ import PagosDocentes from "./pages/PagosDocentes";
 import PagosEstudiantes from "./pages/PagosEstudiantes";
 import Asistencias from "./pages/Asistencias";
 
+import LogPagos from "./pages/LogPagos";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -106,6 +107,11 @@ function App(){
                             <Asistencias/>
                         </ProtectedRoute>
                     }
+                />
+
+                <Route 
+                path="/log-pagos" 
+                element={<LogPagos/>}
                 />
 
                 <Route

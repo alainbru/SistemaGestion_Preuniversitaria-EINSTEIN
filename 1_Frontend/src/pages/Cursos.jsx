@@ -3,6 +3,7 @@ import Layout from "../components/Layout";
 import CursoForm from "../components/CursoForm";
 import { listarCursos, eliminarCurso, buscarCurso } from "../api/cursoApi";
 import Modal from "../components/Modal";
+import "../styles/Cursos.css";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -117,9 +118,40 @@ function Cursos() {
               <td>{c.nombre_curso}</td>
               <td>{c.descripcion}</td>
               <td>{c.estado}</td>
-              <td>
-                <button onClick={() => editar(c)}>Editar</button>
-                <button onClick={() => eliminar(c.id_curso)}>Desactivar</button>
+             <td className="acciones-tabla">
+
+
+              <button
+
+              className="btn-edit"
+
+              onClick={()=>editar(c)}
+
+              title="Editar"
+
+              >
+
+              ✏️
+
+              </button>
+
+
+
+              <button
+
+              className="btn-delete"
+
+              onClick={()=>eliminar(c.id_curso)}
+
+              title="Desactivar"
+
+              >
+
+              🗑️
+
+              </button>
+
+
               </td>
             </tr>
           ))}

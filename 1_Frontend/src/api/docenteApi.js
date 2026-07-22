@@ -7,6 +7,12 @@ export const listarDocentes = () => {
 };
 
 
+// ALIAS PARA COMPATIBILIDAD
+export const obtenerDocentes = () => {
+    return listarDocentes();
+};
+
+
 // REGISTRAR
 export const registrarDocente = (datos) => {
     return api.post("/docentes/", datos);

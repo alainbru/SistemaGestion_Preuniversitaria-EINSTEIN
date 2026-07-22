@@ -15,6 +15,7 @@ import Matriculas from "../pages/Matriculas";
 import PagosDocentes from "../pages/PagosDocentes";
 import PagosEstudiantes from "../pages/PagosEstudiantes";
 import Asistencias from "../pages/Asistencias";
+import LogPagos from "../pages/LogPagos";
 
 
 function AppRoutes(){
@@ -100,6 +101,15 @@ function AppRoutes(){
                     element={
                         <ProtectedRoute>
                             <Asistencias/>
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/log-pagos"
+                    element={
+                        <ProtectedRoute>
+                            <LogPagos/>
                         </ProtectedRoute>
                     }
                 />

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import "../App.css";
 
 
 function Sidebar(){
@@ -18,14 +19,20 @@ function Sidebar(){
 
     return (
 
-        <div className="sidebar">
-
-            <h2>
-                Einstein
-            </h2>
+        <aside className="sidebar">
 
 
-            <nav>
+            <div className="sidebar-logo">
+
+                <h2>
+                    Einstein
+                </h2>
+
+            </div>
+
+
+
+            <nav className="sidebar-menu">
 
 
                 <Link to="/dashboard">
@@ -73,15 +80,26 @@ function Sidebar(){
                 </Link>
 
 
+                <Link to="/log-pagos">
+                    💳 Historial Pagos
+                </Link>
+
+
             </nav>
 
 
-            <button onClick={cerrarSesion}>
+
+            <button 
+                className="btn-logout"
+                onClick={cerrarSesion}
+            >
+
                 🚪 Cerrar sesión
+
             </button>
 
 
-        </div>
+        </aside>
 
     );
 

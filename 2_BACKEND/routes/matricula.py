@@ -13,14 +13,34 @@ matricula_bp = Blueprint(
 @matricula_bp.route("/", methods=["POST"])
 def registrar_matricula():
 
-    datos = request.json
+    datos = request.get_json()
 
-    fecha_matricula = datos["fecha_matricula"]
-    fecha_inicio = datos["fecha_inicio"]
-    fecha_fin = datos["fecha_fin"]
-    id_estudiante = datos["id_estudiante"]
-    id_ciclo = datos["id_ciclo"]
-    id_grupo = datos["id_grupo"]
+    if not datos:
+        return jsonify({
+            "error": "No se recibieron datos"
+        }), 400
+
+
+    fecha_matricula = datos.get("fecha_matricula")
+    fecha_inicio = datos.get("fecha_inicio")
+    fecha_fin = datos.get("fecha_fin")
+    id_estudiante = datos.get("id_estudiante")
+    id_ciclo = datos.get("id_ciclo")
+    id_grupo = datos.get("id_grupo")
+
+
+    if not all([
+        fecha_matricula,
+        fecha_inicio,
+        fecha_fin,
+        id_estudiante,
+        id_ciclo,
+        id_grupo
+    ]):
+        return jsonify({
+            "error": "Faltan datos obligatorios"
+        }), 400
+
 
 
     conexion = obtener_conexion()
@@ -51,7 +71,6 @@ def registrar_matricula():
     return jsonify({
         "mensaje": "Matrícula registrada correctamente"
     }), 201
-    
     
     
     # LISTAR MATRICULAS

@@ -24,3 +24,9 @@ export const anularMatricula = (id) => {
 
     return api.put(`/matriculas/${id}/anular`);
 };
+
+export const obtenerCiclos = () => {
+
+    return api.get("/ciclos/");
+
+};
